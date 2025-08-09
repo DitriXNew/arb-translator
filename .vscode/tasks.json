@@ -1,0 +1,128 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Flutter: Get Dependencies",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["pub", "get"],
+            "options": {
+                "cwd": "${workspaceFolder}/arb_translator"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: Clean",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["clean"],
+            "options": {
+                "cwd": "${workspaceFolder}/arb_translator"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: Build Windows",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["build", "windows", "--release"],
+            "options": {
+                "cwd": "${workspaceFolder}/arb_translator"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: Run Tests",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["test"],
+            "options": {
+                "cwd": "${workspaceFolder}/arb_translator"
+            },
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Dart: Analyze",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["analyze"],
+            "options": {
+                "cwd": "${workspaceFolder}/arb_translator"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Dart: Code Generation",
+            "type": "shell",
+            "command": "dart",
+            "args": ["run", "build_runner", "build", "--delete-conflicting-outputs"],
+            "options": {
+                "cwd": "${workspaceFolder}/arb_translator"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Dart: Watch Code Generation",
+            "type": "shell",
+            "command": "dart",
+            "args": ["run", "build_runner", "watch", "--delete-conflicting-outputs"],
+            "options": {
+                "cwd": "${workspaceFolder}/arb_translator"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": [],
+            "isBackground": true
+        }
+    ]
+}
