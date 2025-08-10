@@ -51,109 +51,109 @@ class ProjectToolbar extends ConsumerWidget {
           ],
           const SizedBox(width: AppSpacing.s),
           // Filters
-        IconButton(
-          tooltip: state.showOnlyErrors ? 'Show all rows' : 'Filter: only rows with placeholder errors',
-          onPressed: hasFolder ? controller.toggleFilterErrors : null,
-          icon: Icon(Icons.shield, size: 18, color: state.showOnlyErrors ? accent : AppColors.textPrimary),
-        ),
-        const SizedBox(width: AppSpacing.xs),
-        IconButton(
-          tooltip: state.showOnlyUntranslated ? 'Show all rows' : 'Filter: only untranslated cells',
-          onPressed: hasFolder ? controller.toggleFilterUntranslated : null,
-          icon: Icon(Icons.translate, size: 18, color: state.showOnlyUntranslated ? accent : AppColors.textPrimary),
-        ),
-        const SizedBox(width: AppSpacing.xs),
-        Tooltip(
-          message: 'Remove keys missing in English (orphan keys from other locales)',
-          child: IconButton(
-            icon: const Icon(Icons.cleaning_services, size: 18),
-            onPressed: hasFolder
-                ? () async {
-                    final orphanCount = state.entries.where((e) {
-                      final enVal = (e.values[state.baseLocale] ?? '').trim();
-                      final missingInBase = state.baseLocaleKeys.isNotEmpty && !state.baseLocaleKeys.contains(e.key);
-                      return missingInBase || enVal.isEmpty;
-                    }).length;
-                    if (orphanCount == 0) {
-                      // Always delegate to controller so it can log & notify consistently.
-                      controller.removeKeysMissingInEnglish();
-                      return;
-                    }
-                    final confirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Confirm cleanup'),
-                        content: Text(
-                          'Remove $orphanCount orphan key(s) that are missing from English? This cannot be undone except via Undo stack.',
+          IconButton(
+            tooltip: state.showOnlyErrors ? 'Show all rows' : 'Filter: only rows with placeholder errors',
+            onPressed: hasFolder ? controller.toggleFilterErrors : null,
+            icon: Icon(Icons.shield, size: 18, color: state.showOnlyErrors ? accent : AppColors.textPrimary),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          IconButton(
+            tooltip: state.showOnlyUntranslated ? 'Show all rows' : 'Filter: only untranslated cells',
+            onPressed: hasFolder ? controller.toggleFilterUntranslated : null,
+            icon: Icon(Icons.translate, size: 18, color: state.showOnlyUntranslated ? accent : AppColors.textPrimary),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Tooltip(
+            message: 'Remove keys missing in English (orphan keys from other locales)',
+            child: IconButton(
+              icon: const Icon(Icons.cleaning_services, size: 18),
+              onPressed: hasFolder
+                  ? () async {
+                      final orphanCount = state.entries.where((e) {
+                        final enVal = (e.values[state.baseLocale] ?? '').trim();
+                        final missingInBase = state.baseLocaleKeys.isNotEmpty && !state.baseLocaleKeys.contains(e.key);
+                        return missingInBase || enVal.isEmpty;
+                      }).length;
+                      if (orphanCount == 0) {
+                        // Always delegate to controller so it can log & notify consistently.
+                        controller.removeKeysMissingInEnglish();
+                        return;
+                      }
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Confirm cleanup'),
+                          content: Text(
+                            'Remove $orphanCount orphan key(s) that are missing from English? This cannot be undone except via Undo stack.',
+                          ),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                            ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Remove')),
+                          ],
                         ),
-                        actions: [
-                          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Remove')),
-                        ],
-                      ),
-                    );
-                    if (confirmed ?? false) controller.removeKeysMissingInEnglish();
-                  }
-                : null,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xs),
-        Tooltip(
-          message: 'Remove keys with empty English value',
-          child: IconButton(
-            icon: const Icon(Icons.filter_alt_off, size: 18),
-            onPressed: hasFolder
-                ? () async {
-                    final emptyCount = state.entries
-                        .where((e) => (e.values[state.baseLocale] ?? '').trim().isEmpty)
-                        .length;
-                    if (emptyCount == 0) {
-                      controller.removeKeysWithEmptyEnglish();
-                      return;
+                      );
+                      if (confirmed ?? false) controller.removeKeysMissingInEnglish();
                     }
-                    final confirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Confirm removal'),
-                        content: Text('Remove $emptyCount key(s) whose English value is empty?'),
-                        actions: [
-                          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Remove')),
-                        ],
-                      ),
-                    );
-                    if (confirmed ?? false) controller.removeKeysWithEmptyEnglish();
-                  }
-                : null,
+                  : null,
+            ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.l),
-        // Undo / Redo
-        iconBtn(icon: Icons.undo, tooltip: 'Undo (Ctrl+Z)', onPressed: hasFolder ? controller.undo : null),
-        iconBtn(icon: Icons.redo, tooltip: 'Redo (Ctrl+Y)', onPressed: hasFolder ? controller.redo : null),
-        const SizedBox(width: AppSpacing.s),
-        IconButton(
-          tooltip: 'AI Settings (API key & glossary prompt)',
-          icon: const Icon(Icons.settings, size: 20),
-          onPressed: () => _showAiSettingsDialog(context, ref),
-        ),
-        const SizedBox(width: AppSpacing.xs),
-        IconButton(
-          tooltip: 'View Application Logs (Debug)',
-          icon: const Icon(Icons.bug_report, size: 20),
-          onPressed: () => LogViewerDialog.show(context),
-        ),
-        const SizedBox(width: AppSpacing.s),
-        // Strategy selector
-        _StrategySelector(),
-        const SizedBox(width: AppSpacing.s),
-        ElevatedButton.icon(
-          onPressed: hasFolder && state.hasUnsavedChanges && !state.isSaving ? controller.saveAll : null,
-          icon: const Icon(Icons.save, size: 16),
-          label: const Text('Save'),
-        ),
-      ],
-    ),
+          const SizedBox(width: AppSpacing.xs),
+          Tooltip(
+            message: 'Remove keys with empty English value',
+            child: IconButton(
+              icon: const Icon(Icons.filter_alt_off, size: 18),
+              onPressed: hasFolder
+                  ? () async {
+                      final emptyCount = state.entries
+                          .where((e) => (e.values[state.baseLocale] ?? '').trim().isEmpty)
+                          .length;
+                      if (emptyCount == 0) {
+                        controller.removeKeysWithEmptyEnglish();
+                        return;
+                      }
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Confirm removal'),
+                          content: Text('Remove $emptyCount key(s) whose English value is empty?'),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                            ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Remove')),
+                          ],
+                        ),
+                      );
+                      if (confirmed ?? false) controller.removeKeysWithEmptyEnglish();
+                    }
+                  : null,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.l),
+          // Undo / Redo
+          iconBtn(icon: Icons.undo, tooltip: 'Undo (Ctrl+Z)', onPressed: hasFolder ? controller.undo : null),
+          iconBtn(icon: Icons.redo, tooltip: 'Redo (Ctrl+Y)', onPressed: hasFolder ? controller.redo : null),
+          const SizedBox(width: AppSpacing.s),
+          IconButton(
+            tooltip: 'AI Settings (API key & glossary prompt)',
+            icon: const Icon(Icons.settings, size: 20),
+            onPressed: () => _showAiSettingsDialog(context, ref),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          IconButton(
+            tooltip: 'View Application Logs (Debug)',
+            icon: const Icon(Icons.bug_report, size: 20),
+            onPressed: () => LogViewerDialog.show(context),
+          ),
+          const SizedBox(width: AppSpacing.s),
+          // Strategy selector
+          _StrategySelector(),
+          const SizedBox(width: AppSpacing.s),
+          ElevatedButton.icon(
+            onPressed: hasFolder && state.hasUnsavedChanges && !state.isSaving ? controller.saveAll : null,
+            icon: const Icon(Icons.save, size: 16),
+            label: const Text('Save'),
+          ),
+        ],
+      ),
     );
     return row;
   }
