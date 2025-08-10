@@ -30,20 +30,15 @@ jobs:
             target: windows
     steps:
       - uses: actions/checkout@v4
+      - name: Validate version format
+        run: |
+          if ! echo "${{ github.event.inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "Invalid semver: ${{ github.event.inputs.version }}"; exit 1; fi
       - name: Set up Flutter (cached)
         uses: subosito/flutter-action@v2
         with:
           channel: ${{ env.FLUTTER_VERSION }}
           cache: true
-        - name: Validate version format
-          run: |
-            if ! echo "${{ github.event.inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
-              echo "Invalid semver: ${{ github.event.inputs.version }}"; exit 1; fi
-        - name: Set up Flutter (cached)
-          uses: subosito/flutter-action@v2
-          with:
-            channel: ${{ env.FLUTTER_VERSION }}
-            cache: true
       - name: Enable targets
         run: |
           if [ "${{ matrix.target }}" = "linux" ]; then flutter config --enable-linux-desktop; fi
