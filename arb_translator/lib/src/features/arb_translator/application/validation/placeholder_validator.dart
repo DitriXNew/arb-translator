@@ -24,8 +24,7 @@ class PlaceholderValidator {
 
     if (locale == baseLocale) {
       // Revalidate all locales for this key
-      for (final l
-          in allEntries.firstWhere((e) => e.key == entry.key).values.keys) {
+      for (final l in allEntries.firstWhere((e) => e.key == entry.key).values.keys) {
         if (l == baseLocale) continue;
       }
       // Iterate locales list from entry values

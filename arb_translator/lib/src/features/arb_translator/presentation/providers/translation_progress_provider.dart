@@ -12,17 +12,13 @@ class TranslationProgressState {
   final int total;
   final bool cancelRequested;
   double get progress => total == 0 ? 0 : done / total;
-  TranslationProgressState copyWith({
-    bool? isTranslating,
-    int? done,
-    int? total,
-    bool? cancelRequested,
-  }) => TranslationProgressState(
-    isTranslating: isTranslating ?? this.isTranslating,
-    done: done ?? this.done,
-    total: total ?? this.total,
-    cancelRequested: cancelRequested ?? this.cancelRequested,
-  );
+  TranslationProgressState copyWith({bool? isTranslating, int? done, int? total, bool? cancelRequested}) =>
+      TranslationProgressState(
+        isTranslating: isTranslating ?? this.isTranslating,
+        done: done ?? this.done,
+        total: total ?? this.total,
+        cancelRequested: cancelRequested ?? this.cancelRequested,
+      );
 }
 
 class TranslationProgress extends Notifier<TranslationProgressState> {
@@ -50,7 +46,6 @@ class TranslationProgress extends Notifier<TranslationProgressState> {
   }
 }
 
-final translationProgressProvider =
-    NotifierProvider<TranslationProgress, TranslationProgressState>(
-      TranslationProgress.new,
-    );
+final translationProgressProvider = NotifierProvider<TranslationProgress, TranslationProgressState>(
+  TranslationProgress.new,
+);

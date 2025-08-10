@@ -13,8 +13,7 @@ const activeCellTranslationProvider = ActiveCellTranslationProvider._();
 
 /// Active per-cell translation indicator using a generated Notifier provider.
 /// Stores (key, locale) of the cell currently being translated.
-final class ActiveCellTranslationProvider
-    extends $NotifierProvider<ActiveCellTranslation, (String, String)?> {
+final class ActiveCellTranslationProvider extends $NotifierProvider<ActiveCellTranslation, (String, String)?> {
   /// Active per-cell translation indicator using a generated Notifier provider.
   /// Stores (key, locale) of the cell currently being translated.
   const ActiveCellTranslationProvider._()
@@ -37,15 +36,11 @@ final class ActiveCellTranslationProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue((String, String)? value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<(String, String)?>(value),
-    );
+    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<(String, String)?>(value));
   }
 }
 
-String _$activeCellTranslationHash() =>
-    r'908ae727af2f8798fae446932e0d3417b10e8569';
+String _$activeCellTranslationHash() => r'908ae727af2f8798fae446932e0d3417b10e8569';
 
 abstract class _$ActiveCellTranslation extends $Notifier<(String, String)?> {
   (String, String)? build();

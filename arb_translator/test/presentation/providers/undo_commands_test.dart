@@ -22,20 +22,11 @@ void main() {
     test('update cell undo/redo', () {
       final ctrl = container.read(projectControllerProvider.notifier);
       ctrl.updateCell(key: 'k', locale: 'fr', text: 'Salut');
-      expect(
-        container.read(projectControllerProvider).entries.first.values['fr'],
-        'Salut',
-      );
+      expect(container.read(projectControllerProvider).entries.first.values['fr'], 'Salut');
       ctrl.undo();
-      expect(
-        container.read(projectControllerProvider).entries.first.values['fr'],
-        '',
-      );
+      expect(container.read(projectControllerProvider).entries.first.values['fr'], '');
       ctrl.redo();
-      expect(
-        container.read(projectControllerProvider).entries.first.values['fr'],
-        'Salut',
-      );
+      expect(container.read(projectControllerProvider).entries.first.values['fr'], 'Salut');
     });
 
     test('rename key undo/redo', () {

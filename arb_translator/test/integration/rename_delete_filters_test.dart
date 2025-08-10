@@ -17,9 +17,7 @@ void main() {
       ds = ArbFileDataSource();
     });
 
-    Future<(ProviderContainer, ProjectController)> loadTemp(
-      Map<String, String> files,
-    ) async {
+    Future<(ProviderContainer, ProjectController)> loadTemp(Map<String, String> files) async {
       final dir = await Directory.systemTemp.createTemp('arb_cases');
       for (final entry in files.entries) {
         await File(p.join(dir.path, entry.key)).writeAsString(entry.value);
@@ -36,26 +34,17 @@ void main() {
         container.dispose();
         if (await dir.exists()) await dir.delete(recursive: true);
       });
-      controller.state = ProjectState(
-        folderPath: dir.path,
-        baseLocale: base,
-        locales: locales,
-        entries: entries,
-      );
+      controller.state = ProjectState(folderPath: dir.path, baseLocale: base, locales: locales, entries: entries);
       return (container, controller);
     }
 
     test('rename key persists after save & clears dirty', () async {
       final (container, controller) = await loadTemp({
-        'app_en.arb':
-            '{"@@locale":"en","hello":"Hello","@hello":{"description":"Hi"}}',
+        'app_en.arb': '{"@@locale":"en","hello":"Hello","@hello":{"description":"Hi"}}',
         'app_de.arb': '{"@@locale":"de","hello":"Hallo"}',
       });
       controller.renameKey(oldKey: 'hello', newKey: 'greeting');
-      expect(
-        controller.state.dirtyCells.where((c) => c.$1 == 'greeting').length,
-        controller.state.locales.length,
-      );
+      expect(controller.state.dirtyCells.where((c) => c.$1 == 'greeting').length, controller.state.locales.length);
       await controller.saveAll();
       expect(controller.state.dirtyCells, isEmpty);
       expect(controller.state.hasUnsavedChanges, isFalse);
@@ -65,9 +54,7 @@ void main() {
       final (_, _, entries2) = await loader(controller.state.folderPath!);
       expect(entries2.any((e) => e.key == 'greeting'), isTrue);
       expect(entries2.any((e) => e.key == 'hello'), isFalse);
-      final enFile = await File(
-        p.join(controller.state.folderPath!, 'app_en.arb'),
-      ).readAsString();
+      final enFile = await File(p.join(controller.state.folderPath!, 'app_en.arb')).readAsString();
       expect(enFile.contains('@greeting'), isTrue);
       expect(enFile.contains('@hello'), isFalse);
     });
@@ -88,8 +75,7 @@ void main() {
 
     test('combined filters (errors ∩ untranslated)', () async {
       final (container, controller) = await loadTemp({
-        'app_en.arb':
-            '{"@@locale":"en","combo":"Hi {name}","@combo":{"placeholders":{"name":{}}}}',
+        'app_en.arb': '{"@@locale":"en","combo":"Hi {name}","@combo":{"placeholders":{"name":{}}}}',
         'app_de.arb': '{"@@locale":"de","combo":"Hi"}',
         'app_fr.arb': '{"@@locale":"fr"}',
       });
@@ -99,19 +85,13 @@ void main() {
       expect(controller.state.errorCells.contains(('combo', 'de')), isTrue);
       // Apply errors filter -> key appears
       controller.toggleFilterErrors();
-      expect(container.read(filteredEntriesProvider).map((e) => e.key), [
-        'combo',
-      ]);
+      expect(container.read(filteredEntriesProvider).map((e) => e.key), ['combo']);
       // Apply untranslated filter as well (fr empty) -> still present
       controller.toggleFilterUntranslated();
-      expect(container.read(filteredEntriesProvider).map((e) => e.key), [
-        'combo',
-      ]);
+      expect(container.read(filteredEntriesProvider).map((e) => e.key), ['combo']);
       // Removing errors filter leaves untranslated still -> still present
       controller.toggleFilterErrors();
-      expect(container.read(filteredEntriesProvider).map((e) => e.key), [
-        'combo',
-      ]);
+      expect(container.read(filteredEntriesProvider).map((e) => e.key), ['combo']);
     });
   });
 }

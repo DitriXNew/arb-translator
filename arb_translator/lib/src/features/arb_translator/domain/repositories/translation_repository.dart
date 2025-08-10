@@ -4,10 +4,7 @@ import 'package:arb_translator/src/features/arb_translator/domain/entities/trans
 abstract class TranslationRepository {
   /// Load all .arb files in [folderPath].
   /// Returns (baseLocale, locales, entries).
-  Future<
-    (String baseLocale, List<String> locales, List<TranslationEntry> entries)
-  >
-  loadFolder(String folderPath);
+  Future<(String baseLocale, List<String> locales, List<TranslationEntry> entries)> loadFolder(String folderPath);
 
   /// Persist current entries to disk across all locales.
   Future<void> saveAll({

@@ -49,31 +49,25 @@ void main() {
       expect(s.errorCells.contains(('greet', 'fr')), isTrue);
     });
 
-    test(
-      'renameKey enforces uniqueness and marks all locales dirty for key',
-      () {
-        final container = ProviderContainer();
-        addTearDown(container.dispose);
-        final controller = container.read(projectControllerProvider.notifier);
-        controller.state = const ProjectState(
-          baseLocale: 'en',
-          locales: ['en', 'de'],
-          entries: [
-            TranslationEntry(key: 'a', values: {'en': '1', 'de': '1'}),
-            TranslationEntry(key: 'b', values: {'en': '2', 'de': '2'}),
-          ],
-        );
-        controller.renameKey(oldKey: 'a', newKey: 'b'); // duplicate -> ignored
-        expect(controller.state.entries.first.key, 'a');
-        controller.renameKey(oldKey: 'a', newKey: 'c');
-        final s = controller.state;
-        expect(s.entries.any((TranslationEntry e) => e.key == 'c'), isTrue);
-        expect(
-          s.dirtyCells.where(((String, String) c) => c.$1 == 'c').length,
-          2,
-        ); // both locales
-      },
-    );
+    test('renameKey enforces uniqueness and marks all locales dirty for key', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final controller = container.read(projectControllerProvider.notifier);
+      controller.state = const ProjectState(
+        baseLocale: 'en',
+        locales: ['en', 'de'],
+        entries: [
+          TranslationEntry(key: 'a', values: {'en': '1', 'de': '1'}),
+          TranslationEntry(key: 'b', values: {'en': '2', 'de': '2'}),
+        ],
+      );
+      controller.renameKey(oldKey: 'a', newKey: 'b'); // duplicate -> ignored
+      expect(controller.state.entries.first.key, 'a');
+      controller.renameKey(oldKey: 'a', newKey: 'c');
+      final s = controller.state;
+      expect(s.entries.any((TranslationEntry e) => e.key == 'c'), isTrue);
+      expect(s.dirtyCells.where(((String, String) c) => c.$1 == 'c').length, 2); // both locales
+    });
 
     test('deleteKey removes entry and marks unsaved', () {
       final container = ProviderContainer();

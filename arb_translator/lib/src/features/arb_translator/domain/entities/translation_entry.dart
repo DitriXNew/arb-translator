@@ -12,6 +12,5 @@ abstract class TranslationEntry with _$TranslationEntry {
     @Default(<String, String>{}) Map<String, String> values,
   }) = _TranslationEntry;
 
-  factory TranslationEntry.fromJson(Map<String, dynamic> json) =>
-      _$TranslationEntryFromJson(json);
+  factory TranslationEntry.fromJson(Map<String, dynamic> json) => _$TranslationEntryFromJson(json);
 }
