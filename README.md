@@ -1,5 +1,12 @@
 <div align="center">
-<h1>ARB Translator</h1>
+<h1>ARB Trans## Screenshot
+![ARB Translator Screenshot](doc/screen.png)
+
+## AI Translation
+* Preserves `{placeholders}` strictly
+* Optional glossary bias
+* Retry (up to 3 attempts) on transient errors
+* Bulk mode skips already filled cells when you pick "Only Empty"</h1>
 <p><strong>Fast Windows desktop tool for managing and AI‑assisting Flutter <code>.arb</code> translations.</strong></p>
 </div>
 
