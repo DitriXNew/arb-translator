@@ -3,9 +3,6 @@ name: Manual Build & Release
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version (e.g. 1.2.3)' 
-        required: true
       create_release:
         description: 'Create GitHub Release'
         required: true
@@ -19,8 +16,21 @@ env:
   PROJECT_PATH: arb_translator
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract version from pubspec
+        id: version
+        run: |
+          VER=$(grep '^version:' ${{ env.PROJECT_PATH }}/pubspec.yaml | cut -d ' ' -f2)
+          echo "version=$VER" >> $GITHUB_OUTPUT
+
   build:
     runs-on: ${{ matrix.os }}
+    needs: version
     strategy:
       matrix:
         include:
@@ -30,10 +40,6 @@ jobs:
             target: windows
     steps:
       - uses: actions/checkout@v4
-      - name: Validate version format
-        run: |
-          if ! echo "${{ github.event.inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
-            echo "Invalid semver: ${{ github.event.inputs.version }}"; exit 1; fi
       - name: Set up Flutter (cached)
         uses: subosito/flutter-action@v2
         with:
@@ -76,7 +82,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    needs: build
+    needs: [build, version]
     if: ${{ github.event.inputs.create_release == 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -88,15 +94,15 @@ jobs:
       - name: Create tag
         run: |
           git fetch --tags
-          if git rev-parse "v${{ github.event.inputs.version }}" >/dev/null 2>&1; then
+          if git rev-parse "v${{ needs.version.outputs.version }}" >/dev/null 2>&1; then
             echo 'Tag exists'; exit 0; fi
-          git tag v${{ github.event.inputs.version }}
-          git push origin v${{ github.event.inputs.version }}
+          git tag v${{ needs.version.outputs.version }}
+          git push origin v${{ needs.version.outputs.version }}
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.event.inputs.version }}
-          name: arb_translator v${{ github.event.inputs.version }}
+          tag_name: v${{ needs.version.outputs.version }}
+          name: arb_translator v${{ needs.version.outputs.version }}
           body: Manual release
           files: |
             artifacts/arb_translator-linux/arb_translator-linux.tar.gz
