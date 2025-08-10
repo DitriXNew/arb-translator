@@ -59,26 +59,33 @@ jobs:
       - name: Generate code
         working-directory: ${{ env.PROJECT_PATH }}
         run: dart run build_runner build --delete-conflicting-outputs
-      - name: Build
+      - name: Build Linux
+        if: matrix.target == 'linux'
         working-directory: ${{ env.PROJECT_PATH }}
-        run: |
-          if [ "${{ matrix.target }}" = "linux" ]; then flutter build linux --release; fi
-          if [ "${{ matrix.target }}" = "windows" ]; then flutter build windows --release; fi
-      - name: Package artifact
-        run: |
-          if [ "${{ matrix.target }}" = "linux" ]; then
-            tar -czf arb_translator-linux.tar.gz -C ${{ env.PROJECT_PATH }}/build/linux/x64/release/bundle .
-          else
-            powershell -Command "Compress-Archive -Path '${{ env.PROJECT_PATH }}\\build\\windows\\x64\\runner\\Release\\*' -DestinationPath arb_translator-windows.zip"
-          fi
-        shell: bash
-      - name: Upload artifact
+        run: flutter build linux --release
+      - name: Build Windows
+        if: matrix.target == 'windows'
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: flutter build windows --release
+      - name: Package Linux artifact
+        if: matrix.target == 'linux'
+        run: tar -czf arb_translator-linux.tar.gz -C ${{ env.PROJECT_PATH }}/build/linux/x64/release/bundle .
+      - name: Package Windows artifact
+        if: matrix.target == 'windows'
+        run: Compress-Archive -Path '${{ env.PROJECT_PATH }}\build\windows\x64\runner\Release\*' -DestinationPath arb_translator-windows.zip
+      - name: Upload Linux artifact
+        if: matrix.target == 'linux'
         uses: actions/upload-artifact@v4
         with:
           name: arb_translator-${{ matrix.target }}
-          path: |
-            arb_translator-linux.tar.gz
-            arb_translator-windows.zip
+          path: arb_translator-linux.tar.gz
+          if-no-files-found: error
+      - name: Upload Windows artifact
+        if: matrix.target == 'windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: arb_translator-${{ matrix.target }}
+          path: arb_translator-windows.zip
           if-no-files-found: error
 
   release:
