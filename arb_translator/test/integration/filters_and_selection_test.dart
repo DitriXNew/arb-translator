@@ -40,20 +40,12 @@ void main() {
       final repo = TranslationRepositoryImpl(ArbFileDataSource());
       final loader = LoadArbFolder(repo);
       final (base, locales, entries) = await loader(tempDir.path);
-      controller.state = ProjectState(
-        folderPath: tempDir.path,
-        baseLocale: base,
-        locales: locales,
-        entries: entries,
-      );
+      controller.state = ProjectState(folderPath: tempDir.path, baseLocale: base, locales: locales, entries: entries);
       // Initially: 2 entries greet & bye
       expect(container.read(filteredEntriesProvider).length, 2);
       // Untranslated filter: es 'bye' empty -> expect only bye
       controller.toggleFilterUntranslated();
-      expect(
-        container.read(filteredEntriesProvider).map((e) => e.key).toList(),
-        ['bye'],
-      );
+      expect(container.read(filteredEntriesProvider).map((e) => e.key).toList(), ['bye']);
       // Clear untranslated filter
       controller.toggleFilterUntranslated();
       // Introduce placeholder error: remove placeholder in es greet
@@ -61,10 +53,7 @@ void main() {
       expect(controller.state.errorCells.contains(('greet', 'es')), isTrue);
       // Apply errors filter -> only greet
       controller.toggleFilterErrors();
-      expect(
-        container.read(filteredEntriesProvider).map((e) => e.key).toList(),
-        ['greet'],
-      );
+      expect(container.read(filteredEntriesProvider).map((e) => e.key).toList(), ['greet']);
     });
   });
 }

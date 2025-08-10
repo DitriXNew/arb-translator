@@ -9,11 +9,7 @@ void main() {
     const base = 'en';
 
     TranslationEntry entry({required String en, String fr = ''}) =>
-        TranslationEntry(
-          key: 'greet',
-          meta: const EntryMetadata(),
-          values: {base: en, if (fr.isNotEmpty) 'fr': fr},
-        );
+        TranslationEntry(key: 'greet', meta: const EntryMetadata(), values: {base: en, if (fr.isNotEmpty) 'fr': fr});
 
     test('detects mismatch', () {
       final e = entry(en: 'Hello {name}', fr: 'Bonjour {nom}');
@@ -48,10 +44,7 @@ void main() {
     });
 
     test('revalidates all locales when base locale changed', () {
-      final e1 = const TranslationEntry(
-        key: 'phrase',
-        values: {base: 'Hi {name}', 'fr': 'Salut {name}'},
-      );
+      final e1 = const TranslationEntry(key: 'phrase', values: {base: 'Hi {name}', 'fr': 'Salut {name}'});
       final errs1 = validator.validateCell(
         entry: e1,
         locale: 'fr',
@@ -61,10 +54,7 @@ void main() {
       );
       expect(errs1, isEmpty);
       // Change base locale placeholders -> now mismatch
-      final e2 = const TranslationEntry(
-        key: 'phrase',
-        values: {base: 'Hi {firstName}', 'fr': 'Salut {name}'},
-      );
+      final e2 = const TranslationEntry(key: 'phrase', values: {base: 'Hi {firstName}', 'fr': 'Salut {name}'});
       final errs2 = validator.validateCell(
         entry: e2,
         locale: base, // indicate base changed

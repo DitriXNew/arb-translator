@@ -36,52 +36,45 @@ void main() {
       if (await tempDir.exists()) await tempDir.delete(recursive: true);
     });
 
-    test(
-      'cycle maintains metadata, adds new translation, placeholder validation ok',
-      () async {
-        final repo = TranslationRepositoryImpl(ds);
-        final loader = LoadArbFolder(repo);
-        final (baseLocale, locales, entries) = await loader(tempDir.path);
-        expect(baseLocale, 'en');
-        expect(locales, ['en', 'de']);
-        // Controller with loaded state
-        final container = ProviderContainer();
-        addTearDown(container.dispose);
-        final controller = container.read(projectControllerProvider.notifier);
-        // Keep provider alive during async ops (auto-dispose otherwise after first await).
-        final sub = container.listen(projectControllerProvider, (_, _) {});
-        addTearDown(sub.close);
-        controller.state = ProjectState(
-          folderPath: tempDir.path,
-          baseLocale: baseLocale,
-          locales: locales,
-          entries: entries,
-        );
-        // Edit: add German bye translation
-        controller.updateCell(key: 'bye', locale: 'de', text: 'Tschüss');
-        expect(controller.state.dirtyCells.contains(('bye', 'de')), isTrue);
-        expect(controller.state.errorCells, isEmpty);
-        // Save
-        await controller.saveAll();
-        expect(controller.state.hasUnsavedChanges, isFalse);
-        // Reload
-        final (base2, locales2, entries2) = await loader(tempDir.path);
-        expect(locales2, ['en', 'de']);
-        final bye = entries2.firstWhere((e) => e.key == 'bye');
-        expect(bye.values['de'], 'Tschüss');
-        // Metadata persisted only in en
-        final enFile = await File(
-          p.join(tempDir.path, 'app_en.arb'),
-        ).readAsString();
-        final deFile = await File(
-          p.join(tempDir.path, 'app_de.arb'),
-        ).readAsString();
-        expect(enFile.contains('@hello'), isTrue);
-        expect(deFile.contains('@hello'), isFalse);
-        // Placeholder mismatch scenario: alter German with missing placeholder
-        controller.updateCell(key: 'hello', locale: 'de', text: 'Hallo');
-        expect(controller.state.errorCells.contains(('hello', 'de')), isTrue);
-      },
-    );
+    test('cycle maintains metadata, adds new translation, placeholder validation ok', () async {
+      final repo = TranslationRepositoryImpl(ds);
+      final loader = LoadArbFolder(repo);
+      final (baseLocale, locales, entries) = await loader(tempDir.path);
+      expect(baseLocale, 'en');
+      expect(locales, ['en', 'de']);
+      // Controller with loaded state
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final controller = container.read(projectControllerProvider.notifier);
+      // Keep provider alive during async ops (auto-dispose otherwise after first await).
+      final sub = container.listen(projectControllerProvider, (_, _) {});
+      addTearDown(sub.close);
+      controller.state = ProjectState(
+        folderPath: tempDir.path,
+        baseLocale: baseLocale,
+        locales: locales,
+        entries: entries,
+      );
+      // Edit: add German bye translation
+      controller.updateCell(key: 'bye', locale: 'de', text: 'Tschüss');
+      expect(controller.state.dirtyCells.contains(('bye', 'de')), isTrue);
+      expect(controller.state.errorCells, isEmpty);
+      // Save
+      await controller.saveAll();
+      expect(controller.state.hasUnsavedChanges, isFalse);
+      // Reload
+      final (base2, locales2, entries2) = await loader(tempDir.path);
+      expect(locales2, ['en', 'de']);
+      final bye = entries2.firstWhere((e) => e.key == 'bye');
+      expect(bye.values['de'], 'Tschüss');
+      // Metadata persisted only in en
+      final enFile = await File(p.join(tempDir.path, 'app_en.arb')).readAsString();
+      final deFile = await File(p.join(tempDir.path, 'app_de.arb')).readAsString();
+      expect(enFile.contains('@hello'), isTrue);
+      expect(deFile.contains('@hello'), isFalse);
+      // Placeholder mismatch scenario: alter German with missing placeholder
+      controller.updateCell(key: 'hello', locale: 'de', text: 'Hallo');
+      expect(controller.state.errorCells.contains(('hello', 'de')), isTrue);
+    });
   });
 }

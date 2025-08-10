@@ -4,11 +4,9 @@ abstract class ProjectUndoCommand {
 }
 
 class UpdateCellCommand implements ProjectUndoCommand {
-  UpdateCellCommand({
-    required void Function() apply,
-    required void Function() revert,
-  }) : _apply = apply,
-       _revert = revert;
+  UpdateCellCommand({required void Function() apply, required void Function() revert})
+    : _apply = apply,
+      _revert = revert;
   final void Function() _apply;
   final void Function() _revert;
   @override
@@ -18,11 +16,9 @@ class UpdateCellCommand implements ProjectUndoCommand {
 }
 
 class RenameKeyCommand implements ProjectUndoCommand {
-  RenameKeyCommand({
-    required void Function() apply,
-    required void Function() revert,
-  }) : _apply = apply,
-       _revert = revert;
+  RenameKeyCommand({required void Function() apply, required void Function() revert})
+    : _apply = apply,
+      _revert = revert;
   final void Function() _apply;
   final void Function() _revert;
   @override
@@ -32,11 +28,9 @@ class RenameKeyCommand implements ProjectUndoCommand {
 }
 
 class DeleteKeyCommand implements ProjectUndoCommand {
-  DeleteKeyCommand({
-    required void Function() apply,
-    required void Function() revert,
-  }) : _apply = apply,
-       _revert = revert;
+  DeleteKeyCommand({required void Function() apply, required void Function() revert})
+    : _apply = apply,
+      _revert = revert;
   final void Function() _apply;
   final void Function() _revert;
   @override
