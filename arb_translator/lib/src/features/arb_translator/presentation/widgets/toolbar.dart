@@ -34,20 +34,23 @@ class ProjectToolbar extends ConsumerWidget {
             onPressed: onPressed,
           ),
         );
-    final row = Row(
-      children: [
-        iconBtn(icon: Icons.folder_open, tooltip: 'Select ARB folder', onPressed: () => _pickFolder(ref), fg: accent),
-        const SizedBox(width: AppSpacing.xs),
-        if (hasFolder)
-          Expanded(
-            child: Text(state.folderPath!, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption11),
-          ),
-        if (state.isLoading) ...[
+    final row = SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          iconBtn(icon: Icons.folder_open, tooltip: 'Select ARB folder', onPressed: () => _pickFolder(ref), fg: accent),
+          const SizedBox(width: AppSpacing.xs),
+          if (hasFolder)
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(state.folderPath!, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption11),
+            ),
+          if (state.isLoading) ...[
+            const SizedBox(width: AppSpacing.s),
+            const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+          ],
           const SizedBox(width: AppSpacing.s),
-          const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
-        ],
-        const Spacer(),
-        // Filters
+          // Filters
         IconButton(
           tooltip: state.showOnlyErrors ? 'Show all rows' : 'Filter: only rows with placeholder errors',
           onPressed: hasFolder ? controller.toggleFilterErrors : null,
@@ -150,6 +153,7 @@ class ProjectToolbar extends ConsumerWidget {
           label: const Text('Save'),
         ),
       ],
+    ),
     );
     return row;
   }

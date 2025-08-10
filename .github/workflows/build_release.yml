@@ -50,6 +50,9 @@ jobs:
       - name: Pub get
         working-directory: ${{ env.PROJECT_PATH }}
         run: flutter pub get
+      - name: Generate code
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: dart run build_runner build --delete-conflicting-outputs
       - name: Build
         working-directory: ${{ env.PROJECT_PATH }}
         run: |

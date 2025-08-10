@@ -9,6 +9,7 @@ import 'package:arb_translator/src/features/arb_translator/data/datasources/arb_
 import 'package:arb_translator/src/features/arb_translator/data/repositories/translation_repository_impl.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/entities/translation_entry.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/usecases/load_arb_folder.dart';
+import 'package:arb_translator/src/features/arb_translator/presentation/providers/active_cell_translation_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_errors_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_providers.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_settings_provider.dart';
