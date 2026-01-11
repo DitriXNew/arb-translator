@@ -132,6 +132,31 @@ class ProjectToolbar extends ConsumerWidget {
           iconBtn(icon: Icons.undo, tooltip: 'Undo (Ctrl+Z)', onPressed: hasFolder ? controller.undo : null),
           iconBtn(icon: Icons.redo, tooltip: 'Redo (Ctrl+Y)', onPressed: hasFolder ? controller.redo : null),
           const SizedBox(width: AppSpacing.s),
+          // Source hash commit button
+          if (hasFolder && state.sourceChangedKeys.isNotEmpty)
+            Tooltip(
+              message: 'Commit source hashes for ${state.sourceChangedKeys.length} changed entries',
+              child: IconButton(
+                icon: const Icon(Icons.lock_clock, size: 20),
+                onPressed: () async {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Commit Source Hashes'),
+                      content: Text(
+                        'Update source hashes for ${state.sourceChangedKeys.length} entries with changed source text? '
+                        'This will mark all current translations as up-to-date.',
+                      ),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                        ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Commit')),
+                      ],
+                    ),
+                  );
+                  if (confirmed ?? false) controller.commitSourceHashes();
+                },
+              ),
+            ),
           IconButton(
             tooltip: 'AI Settings (API key & glossary prompt)',
             icon: const Icon(Icons.settings, size: 20),

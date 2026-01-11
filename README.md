@@ -45,6 +45,13 @@ Focused benefits:
 ## Placeholder Safety
 Every edit or AI result re‑checks placeholder sets vs English. Any difference = highlighted error + filterable.
 
+## Source Change Tracking
+* Automatically detects when source (English) text has changed using SHA-256 hashing
+* Shows ⚠️ icon next to keys with modified source text
+* Displays count of changed source keys in stats panel
+* "Commit Source Hashes" button to update all hashes after reviewing changes
+* Helps identify which translations need updating after source text modifications
+
 ## Cleanup Tools
 * Remove orphan keys (not in base file)
 * Remove empty-English keys

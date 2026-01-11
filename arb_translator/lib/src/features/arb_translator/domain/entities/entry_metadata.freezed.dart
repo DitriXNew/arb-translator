@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$EntryMetadata {
 
- String? get description; Set<String> get placeholders;
+ String? get description; Set<String> get placeholders; String? get sourceHash;
 /// Create a copy of EntryMetadata
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $EntryMetadataCopyWith<EntryMetadata> get copyWith => _$EntryMetadataCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EntryMetadata&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.placeholders, placeholders));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EntryMetadata&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.placeholders, placeholders)&&(identical(other.sourceHash, sourceHash) || other.sourceHash == sourceHash));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,description,const DeepCollectionEquality().hash(placeholders));
+int get hashCode => Object.hash(runtimeType,description,const DeepCollectionEquality().hash(placeholders),sourceHash);
 
 @override
 String toString() {
-  return 'EntryMetadata(description: $description, placeholders: $placeholders)';
+  return 'EntryMetadata(description: $description, placeholders: $placeholders, sourceHash: $sourceHash)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $EntryMetadataCopyWith<$Res>  {
   factory $EntryMetadataCopyWith(EntryMetadata value, $Res Function(EntryMetadata) _then) = _$EntryMetadataCopyWithImpl;
 @useResult
 $Res call({
- String? description, Set<String> placeholders
+ String? description, Set<String> placeholders, String? sourceHash
 });
 
 
@@ -65,11 +65,12 @@ class _$EntryMetadataCopyWithImpl<$Res>
 
 /// Create a copy of EntryMetadata
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? description = freezed,Object? placeholders = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? description = freezed,Object? placeholders = null,Object? sourceHash = freezed,}) {
   return _then(_self.copyWith(
 description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,placeholders: null == placeholders ? _self.placeholders : placeholders // ignore: cast_nullable_to_non_nullable
-as Set<String>,
+as Set<String>,sourceHash: freezed == sourceHash ? _self.sourceHash : sourceHash // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -154,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? description,  Set<String> placeholders)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? description,  Set<String> placeholders,  String? sourceHash)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _EntryMetadata() when $default != null:
-return $default(_that.description,_that.placeholders);case _:
+return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
   return orElse();
 
 }
@@ -175,10 +176,10 @@ return $default(_that.description,_that.placeholders);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? description,  Set<String> placeholders)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? description,  Set<String> placeholders,  String? sourceHash)  $default,) {final _that = this;
 switch (_that) {
 case _EntryMetadata():
-return $default(_that.description,_that.placeholders);case _:
+return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +196,10 @@ return $default(_that.description,_that.placeholders);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? description,  Set<String> placeholders)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? description,  Set<String> placeholders,  String? sourceHash)?  $default,) {final _that = this;
 switch (_that) {
 case _EntryMetadata() when $default != null:
-return $default(_that.description,_that.placeholders);case _:
+return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
   return null;
 
 }
@@ -210,7 +211,7 @@ return $default(_that.description,_that.placeholders);case _:
 @JsonSerializable()
 
 class _EntryMetadata implements EntryMetadata {
-  const _EntryMetadata({this.description, final  Set<String> placeholders = const <String>{}}): _placeholders = placeholders;
+  const _EntryMetadata({this.description, final  Set<String> placeholders = const <String>{}, this.sourceHash}): _placeholders = placeholders;
   factory _EntryMetadata.fromJson(Map<String, dynamic> json) => _$EntryMetadataFromJson(json);
 
 @override final  String? description;
@@ -221,6 +222,7 @@ class _EntryMetadata implements EntryMetadata {
   return EqualUnmodifiableSetView(_placeholders);
 }
 
+@override final  String? sourceHash;
 
 /// Create a copy of EntryMetadata
 /// with the given fields replaced by the non-null parameter values.
@@ -235,16 +237,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EntryMetadata&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._placeholders, _placeholders));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EntryMetadata&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._placeholders, _placeholders)&&(identical(other.sourceHash, sourceHash) || other.sourceHash == sourceHash));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,description,const DeepCollectionEquality().hash(_placeholders));
+int get hashCode => Object.hash(runtimeType,description,const DeepCollectionEquality().hash(_placeholders),sourceHash);
 
 @override
 String toString() {
-  return 'EntryMetadata(description: $description, placeholders: $placeholders)';
+  return 'EntryMetadata(description: $description, placeholders: $placeholders, sourceHash: $sourceHash)';
 }
 
 
@@ -255,7 +257,7 @@ abstract mixin class _$EntryMetadataCopyWith<$Res> implements $EntryMetadataCopy
   factory _$EntryMetadataCopyWith(_EntryMetadata value, $Res Function(_EntryMetadata) _then) = __$EntryMetadataCopyWithImpl;
 @override @useResult
 $Res call({
- String? description, Set<String> placeholders
+ String? description, Set<String> placeholders, String? sourceHash
 });
 
 
@@ -272,11 +274,12 @@ class __$EntryMetadataCopyWithImpl<$Res>
 
 /// Create a copy of EntryMetadata
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? description = freezed,Object? placeholders = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? description = freezed,Object? placeholders = null,Object? sourceHash = freezed,}) {
   return _then(_EntryMetadata(
 description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,placeholders: null == placeholders ? _self._placeholders : placeholders // ignore: cast_nullable_to_non_nullable
-as Set<String>,
+as Set<String>,sourceHash: freezed == sourceHash ? _self.sourceHash : sourceHash // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

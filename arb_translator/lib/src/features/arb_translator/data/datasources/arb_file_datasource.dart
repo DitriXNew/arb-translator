@@ -76,11 +76,17 @@ class ArbFileDataSource {
       // metadata from English @key
       final enMap = perLocale[baseLocale] ?? const {};
       final metaMap = enMap['@$key'] as Map<String, dynamic>?;
+
       EntryMetadata meta;
       if (metaMap != null) {
         final placeholdersRaw = metaMap['placeholders'];
         final placeholders = placeholdersRaw is Map ? Set<String>.from(placeholdersRaw.keys) : const <String>{};
-        meta = EntryMetadata(description: metaMap['description'] as String?, placeholders: placeholders);
+        final storedHash = metaMap['sourceHash'] as String?;
+        meta = EntryMetadata(
+          description: metaMap['description'] as String?,
+          placeholders: placeholders,
+          sourceHash: storedHash,
+        );
       } else {
         meta = const EntryMetadata();
       }
@@ -115,10 +121,12 @@ class ArbFileDataSource {
       if (locale == baseLocale) {
         final hasDescription = (e.meta.description ?? '').isNotEmpty;
         final hasPlaceholders = e.meta.placeholders.isNotEmpty;
-        if (hasDescription || hasPlaceholders) {
+        final hasSourceHash = (e.meta.sourceHash ?? '').isNotEmpty;
+        if (hasDescription || hasPlaceholders || hasSourceHash) {
           map['@${e.key}'] = {
             if (hasDescription) 'description': e.meta.description,
             if (hasPlaceholders) 'placeholders': {for (final p in e.meta.placeholders) p: <String, dynamic>{}},
+            if (hasSourceHash) 'sourceHash': e.meta.sourceHash,
           };
         }
       }

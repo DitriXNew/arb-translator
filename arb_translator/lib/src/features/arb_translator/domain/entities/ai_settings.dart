@@ -2,7 +2,7 @@ class AiSettings {
   const AiSettings({
     this.apiKeyMasked,
     this.glossaryPrompt = '',
-    this.openAiModel = 'gpt-5', // fixed
+    this.openAiModel = 'gpt-5-mini', // fixed
   });
   final String? apiKeyMasked;
   final String glossaryPrompt;

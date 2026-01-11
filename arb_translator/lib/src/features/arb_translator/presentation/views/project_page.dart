@@ -210,6 +210,7 @@ class _StatusBar extends ConsumerWidget {
       return false;
     }).length;
     final dirty = state.dirtyCells.length;
+    final sourceChanged = state.sourceChangedKeys.length;
     final hasFilters = state.searchQuery.isNotEmpty || state.showOnlyErrors || state.showOnlyUntranslated;
     return Container(
       height: 26,
@@ -227,6 +228,7 @@ class _StatusBar extends ConsumerWidget {
           _Stat('Errors', errors),
           _Stat('Untranslated', untranslated),
           _Stat('Dirty cells', dirty),
+          if (sourceChanged > 0) _StatWithColor('Source changed', sourceChanged, Colors.orange),
           if (state.searchQuery.isNotEmpty)
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -256,6 +258,25 @@ class _Stat extends StatelessWidget {
       Text(label, style: const TextStyle(fontSize: 11, color: Color(0xFFAAAAAA))),
       const SizedBox(width: 4),
       Text('$value', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11)),
+    ],
+  );
+}
+
+class _StatWithColor extends StatelessWidget {
+  const _StatWithColor(this.label, this.value, this.color);
+  final String label;
+  final int value;
+  final Color color;
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(label, style: const TextStyle(fontSize: 11, color: Color(0xFFAAAAAA))),
+      const SizedBox(width: 4),
+      Text(
+        '$value',
+        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 11, color: color),
+      ),
     ],
   );
 }

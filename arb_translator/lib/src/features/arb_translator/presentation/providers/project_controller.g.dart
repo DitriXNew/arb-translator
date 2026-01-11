@@ -9,7 +9,8 @@ part of 'project_controller.dart';
 @ProviderFor(ProjectController)
 const projectControllerProvider = ProjectControllerProvider._();
 
-final class ProjectControllerProvider extends $NotifierProvider<ProjectController, ProjectState> {
+final class ProjectControllerProvider
+    extends $NotifierProvider<ProjectController, ProjectState> {
   const ProjectControllerProvider._()
     : super(
         from: null,
@@ -30,11 +31,14 @@ final class ProjectControllerProvider extends $NotifierProvider<ProjectControlle
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ProjectState value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<ProjectState>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ProjectState>(value),
+    );
   }
 }
 
-String _$projectControllerHash() => r'92bb77fc94befd161fca19e844d29ba86fc64e16';
+String _$projectControllerHash() => r'3aa1b2658f11fec5995592e055e5db6c78117f04';
 
 abstract class _$ProjectController extends $Notifier<ProjectState> {
   ProjectState build();
@@ -44,7 +48,13 @@ abstract class _$ProjectController extends $Notifier<ProjectState> {
     final created = build();
     final ref = this.ref as $Ref<ProjectState, ProjectState>;
     final element =
-        ref.element as $ClassProviderElement<AnyNotifier<ProjectState, ProjectState>, ProjectState, Object?, Object?>;
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<ProjectState, ProjectState>,
+              ProjectState,
+              Object?,
+              Object?
+            >;
     element.handleValue(ref, created);
   }
 }

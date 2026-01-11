@@ -29,6 +29,6 @@ class OpenAiTranslationStrategy implements AiTranslationStrategy {
       glossary: glossaryPrompt,
     );
     // Hard-coded model (gpt-5) per current specification (temperature removed).
-    return _ds.translate(apiKey: apiKey, prompt: prompt, model: 'gpt-5');
+    return _ds.translate(apiKey: apiKey, prompt: prompt);
   }
 }

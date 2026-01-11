@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:arb_translator/src/core/services/log_service.dart';
+import 'package:arb_translator/src/core/utils/hash_utils.dart';
 import 'package:arb_translator/src/features/arb_translator/application/services/translation_batch_executor.dart';
 import 'package:arb_translator/src/features/arb_translator/application/undo/commands.dart';
 import 'package:arb_translator/src/features/arb_translator/application/validation/placeholder_validator.dart';
@@ -49,6 +50,7 @@ class ProjectController extends _$ProjectController {
       // from base file) from keys that are present but empty. This fixes previous heuristic that
       // missed empty-but-present keys.
       Set<String> baseKeys = <String>{};
+      final Set<String> sourceChangedKeys = <String>{};
       try {
         final normalizedPath = path.endsWith(Platform.pathSeparator) ? path.substring(0, path.length - 1) : path;
         final baseFile = File('$normalizedPath${Platform.pathSeparator}app_$baseLocale.arb');
@@ -57,6 +59,15 @@ class ProjectController extends _$ProjectController {
           // ignore: avoid_slow_async_io (single read on load acceptable)
           final raw = json.decode(await baseFile.readAsString()) as Map<String, dynamic>;
           baseKeys = raw.keys.where((k) => !k.startsWith('@') && k != '@@locale').cast<String>().toSet();
+
+          // Check for source changes based on stored hashes
+          for (final entry in entries) {
+            final currentText = entry.values[baseLocale] ?? '';
+            if (currentText.isNotEmpty && HashUtils.isSourceChanged(currentText, entry.meta.sourceHash)) {
+              sourceChangedKeys.add(entry.key);
+              logInfo('Source changed detected for key: ${entry.key}');
+            }
+          }
         } else {
           logWarning('Base locale file not found when computing baseLocaleKeys: ${baseFile.path}');
         }
@@ -70,6 +81,7 @@ class ProjectController extends _$ProjectController {
         locales: locales,
         entries: entries,
         baseLocaleKeys: baseKeys,
+        sourceChangedKeys: sourceChangedKeys,
         isLoading: false,
         hasUnsavedChanges: false,
         dirtyCells: <(String, String)>{},
@@ -431,5 +443,33 @@ class ProjectController extends _$ProjectController {
   void redo() {
     final mgr = ref.read(undoManagerProvider);
     if (mgr.canRedo) mgr.redo();
+  }
+
+  /// Update source hashes for all entries with current base locale text
+  /// This should be called after translating changed source entries
+  void commitSourceHashes() {
+    logInfo('Committing source hashes for all entries');
+
+    final updatedEntries = <TranslationEntry>[];
+    final baseLocale = state.baseLocale;
+
+    for (final entry in state.entries) {
+      final sourceText = entry.values[baseLocale] ?? '';
+      if (sourceText.isNotEmpty) {
+        final newHash = HashUtils.computeSourceHash(sourceText);
+        final updatedMeta = entry.meta.copyWith(sourceHash: newHash);
+        updatedEntries.add(entry.copyWith(meta: updatedMeta));
+      } else {
+        updatedEntries.add(entry);
+      }
+    }
+
+    state = state.copyWith(
+      entries: updatedEntries,
+      sourceChangedKeys: <String>{}, // Clear all source changed keys
+      hasUnsavedChanges: true, // Mark as needing save
+    );
+
+    logInfo('Source hashes committed for ${updatedEntries.length} entries');
   }
 }

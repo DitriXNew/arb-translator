@@ -32,6 +32,7 @@ class TableCellBuilder {
     final controller = ref.read(projectControllerProvider.notifier);
     final dirty = state.dirtyCells.contains((e.key, colId.startsWith('loc_') ? colId.substring(4) : state.baseLocale));
     final isError = colId.startsWith('loc_') && state.errorCells.contains((e.key, colId.substring(4)));
+    final isSourceChanged = state.sourceChangedKeys.contains(e.key);
     final activeTranslating = ref.watch(activeCellTranslationProvider);
     final isTranslating = colId.startsWith('loc_') && activeTranslating == (e.key, colId.substring(4));
 
@@ -61,31 +62,50 @@ class TableCellBuilder {
       ),
       child: Stack(
         children: [
-          _buildCellContent(e, colId, bg, controller),
+          _buildCellContent(e, colId, bg, controller, isSourceChanged),
           if (isTranslating) const Positioned(top: 2, left: 4, width: 12, height: 12, child: _MiniSpinner()),
         ],
       ),
     );
   }
 
-  Widget _buildCellContent(TranslationEntry e, String colId, Color bg, ProjectController controller) {
+  Widget _buildCellContent(
+    TranslationEntry e,
+    String colId,
+    Color bg,
+    ProjectController controller,
+    bool isSourceChanged,
+  ) {
     switch (colId) {
       case 'key':
-        return TranslationCell(
-          width: colWidths[colId]! - 1,
-          text: e.key,
-          editable: true,
-          centerVertically: true,
-          background: bg,
-          onCommit: (v) {
-            final trimmed = v.trim();
-            if (trimmed.isNotEmpty && trimmed != e.key) {
-              controller.renameKey(oldKey: e.key, newKey: trimmed);
-            }
-          },
-          onSecondaryTapDown: (d) => onShowCellMenu(position: d.globalPosition, entry: e, colId: colId),
-          onTap: () => onToggleSelection(e.key, add: false),
-          horizontalScrollController: horizontalScrollController,
+        return Stack(
+          children: [
+            TranslationCell(
+              width: colWidths[colId]! - 1,
+              text: e.key,
+              editable: true,
+              centerVertically: true,
+              background: bg,
+              onCommit: (v) {
+                final trimmed = v.trim();
+                if (trimmed.isNotEmpty && trimmed != e.key) {
+                  controller.renameKey(oldKey: e.key, newKey: trimmed);
+                }
+              },
+              onSecondaryTapDown: (d) => onShowCellMenu(position: d.globalPosition, entry: e, colId: colId),
+              onTap: () => onToggleSelection(e.key, add: false),
+              horizontalScrollController: horizontalScrollController,
+            ),
+            if (isSourceChanged)
+              const Positioned(
+                top: 2,
+                right: 4,
+                child: Tooltip(
+                  message: 'Source text has changed - consider retranslating',
+                  child: Icon(Icons.refresh, size: 16, color: Colors.orange),
+                ),
+              ),
+          ],
         );
 
       case 'description':
