@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:arb_translator/src/core/theme/color_tokens.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/entities/translation_entry.dart';
+import 'package:arb_translator/src/features/arb_translator/presentation/providers/active_cell_translation_provider.dart';
+import 'package:arb_translator/src/features/arb_translator/presentation/providers/editing_cell_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/filtered_entries_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_state.dart';
@@ -44,9 +46,7 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
   final Map<String, double> _colWidths = {'key': 200, 'description': 240, 'placeholders': 150};
   String? _sortColumn;
   bool _sortAsc = true;
-  bool _listenersAttached = false;
   final Set<String> _selectedKeys = {};
-  double _cachedHorizontalOffset = 0;
 
   // Scroll controllers
   final ScrollController _verticalScroll = ScrollController();
@@ -111,6 +111,10 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
   Widget build(BuildContext context) {
     final state = ref.watch(projectControllerProvider);
     final entriesFiltered = ref.watch(filteredEntriesProvider);
+    // Получаем активную ячейку перевода один раз для всего грида
+    final activeTranslatingCell = ref.watch(activeCellTranslationProvider);
+    // Получаем активную редактируемую ячейку
+    final editingCell = ref.watch(editingCellProvider);
 
     _ensureLocaleWidths(state);
     _columnOrder = ['key', 'description', 'placeholders', for (final l in state.locales) 'loc_$l'];
@@ -121,6 +125,8 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
       state: state,
       colWidths: _colWidths,
       selectedKeys: _selectedKeys,
+      activeTranslatingCell: activeTranslatingCell,
+      editingCell: editingCell,
       onToggleSelection: (key, {required bool add}) => setState(() => _selectedKeys.toggle(key)),
       onShowCellMenu: ({required Offset position, required TranslationEntry entry, required String colId}) {
         String? cellText;
@@ -170,19 +176,7 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
     final frozenCols = [for (final c in _columnOrder.where((c) => _isFrozen(c, state))) c];
     final scrollCols = [for (final c in _columnOrder.where((c) => !_isFrozen(c, state))) c];
 
-    // Attach listeners once: lazy load & horizontal sync
-    if (!_listenersAttached) {
-      _listenersAttached = true;
-      // Removed lazy loading: all rows rendered immediately.
-      // Cache horizontal offset updates to reduce AnimatedBuilder rebuilds
-      _horizontalBody.addListener(() {
-        final newOffset = _horizontalBody.hasClients ? _horizontalBody.offset : 0.0;
-        if (_cachedHorizontalOffset != newOffset) {
-          setState(() => _cachedHorizontalOffset = newOffset);
-        }
-      });
-    }
-    final displayEntries = entries; // All entries loaded (lazy loading removed)
+    final displayEntries = entries;
 
     const headerHeight = 40.0;
     const rowHeight = 60.0; // unified fixed row height
@@ -195,7 +189,7 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
 
     final table = Column(
       children: [
-        // Header: render scrollable portion via Transform synced to bottom horizontal scroll.
+        // Header: render scrollable portion via AnimatedBuilder synced to horizontal scroll
         SizedBox(
           height: headerHeight,
           child: Row(
@@ -208,15 +202,22 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
                 child: ClipRect(child: headerFrozen),
               ),
               Expanded(
-                child: ClipRect(
-                  child: OverflowBox(
-                    maxWidth: double.infinity,
-                    alignment: Alignment.centerLeft,
-                    child: Transform.translate(
-                      offset: Offset(-_cachedHorizontalOffset, 0),
-                      child: SizedBox(width: scrollWidth, height: headerHeight, child: headerScroll),
-                    ),
-                  ),
+                child: AnimatedBuilder(
+                  animation: _horizontalBody,
+                  builder: (context, child) {
+                    final offset = _horizontalBody.hasClients ? _horizontalBody.offset : 0.0;
+                    return ClipRect(
+                      child: OverflowBox(
+                        maxWidth: double.infinity,
+                        alignment: Alignment.centerLeft,
+                        child: Transform.translate(
+                          offset: Offset(-offset, 0),
+                          child: child,
+                        ),
+                      ),
+                    );
+                  },
+                  child: SizedBox(width: scrollWidth, height: headerHeight, child: headerScroll),
                 ),
               ),
             ],
@@ -257,21 +258,28 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
                             ),
                           ),
                         ),
-                        // Scrollable columns - clipped and transformed
+                        // Scrollable columns - clipped and transformed via AnimatedBuilder
                         Expanded(
-                          child: ClipRect(
-                            child: OverflowBox(
-                              maxWidth: double.infinity,
-                              alignment: Alignment.centerLeft,
-                              child: Transform.translate(
-                                offset: Offset(-_cachedHorizontalOffset, 0),
-                                child: SizedBox(
-                                  width: scrollWidth,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [for (final col in scrollCols) _cellBuilder.buildCell(e, col)],
+                          child: AnimatedBuilder(
+                            animation: _horizontalBody,
+                            builder: (context, child) {
+                              final offset = _horizontalBody.hasClients ? _horizontalBody.offset : 0.0;
+                              return ClipRect(
+                                child: OverflowBox(
+                                  maxWidth: double.infinity,
+                                  alignment: Alignment.centerLeft,
+                                  child: Transform.translate(
+                                    offset: Offset(-offset, 0),
+                                    child: child,
                                   ),
                                 ),
+                              );
+                            },
+                            child: SizedBox(
+                              width: scrollWidth,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [for (final col in scrollCols) _cellBuilder.buildCell(e, col)],
                               ),
                             ),
                           ),

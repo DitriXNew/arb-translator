@@ -26,4 +26,16 @@ class MockTranslationStrategy implements AiTranslationStrategy {
     await Future<void>.delayed(const Duration(milliseconds: 10));
     return '$englishText<$targetLocale>';
   }
+
+  @override
+  Future<Map<String, String>> translateBatch({
+    required String apiKey,
+    required List<BatchTranslationItem> items,
+    required String targetLocale,
+    String? glossaryPrompt,
+  }) async {
+    // Simulate slight latency for batch
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    return {for (final item in items) item.key: '${item.text}<$targetLocale>'};
+  }
 }

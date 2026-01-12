@@ -28,7 +28,27 @@ class OpenAiTranslationStrategy implements AiTranslationStrategy {
       description: description,
       glossary: glossaryPrompt,
     );
-    // Hard-coded model (gpt-5) per current specification (temperature removed).
+    // Hard-coded model (gpt-4.1-mini) per current specification.
     return _ds.translate(apiKey: apiKey, prompt: prompt);
+  }
+
+  @override
+  Future<Map<String, String>> translateBatch({
+    required String apiKey,
+    required List<BatchTranslationItem> items,
+    required String targetLocale,
+    String? glossaryPrompt,
+  }) {
+    // Конвертируем BatchTranslationItem в TranslationItem для datasource
+    final dsItems = items
+        .map((item) => TranslationItem(key: item.key, text: item.text, description: item.description))
+        .toList();
+
+    return _ds.translateBatch(
+      apiKey: apiKey,
+      items: dsItems,
+      targetLocale: targetLocale,
+      glossaryPrompt: glossaryPrompt,
+    );
   }
 }

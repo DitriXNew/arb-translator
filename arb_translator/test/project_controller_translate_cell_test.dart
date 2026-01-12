@@ -22,6 +22,18 @@ class _MockStrategy implements AiTranslationStrategy {
   }) async {
     return '[${targetLocale.toUpperCase()}] $englishText';
   }
+
+  @override
+  Future<Map<String, String>> translateBatch({
+    required String apiKey,
+    required List<BatchTranslationItem> items,
+    required String targetLocale,
+    String? glossaryPrompt,
+  }) async {
+    return {
+      for (final item in items) item.key: '[${targetLocale.toUpperCase()}] ${item.text}',
+    };
+  }
 }
 
 void main() {

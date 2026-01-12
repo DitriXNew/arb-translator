@@ -1,6 +1,6 @@
 import 'package:arb_translator/src/core/theme/color_tokens.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/entities/translation_entry.dart';
-import 'package:arb_translator/src/features/arb_translator/presentation/providers/active_cell_translation_provider.dart';
+import 'package:arb_translator/src/features/arb_translator/presentation/providers/editing_cell_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_state.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/translation_cell.dart';
@@ -17,6 +17,8 @@ class TableCellBuilder {
     required this.onShowCellMenu,
     required this.onToggleSelection,
     required this.horizontalScrollController,
+    this.activeTranslatingCell,
+    this.editingCell,
   });
 
   final WidgetRef ref;
@@ -27,14 +29,20 @@ class TableCellBuilder {
   onShowCellMenu;
   final void Function(String key, {required bool add}) onToggleSelection;
   final ScrollController horizontalScrollController;
+  /// Активная ячейка, которая сейчас переводится (key, locale)
+  final (String, String)? activeTranslatingCell;
+  /// Активная редактируемая ячейка (key, colId)
+  final (String, String)? editingCell;
 
   Widget buildCell(TranslationEntry e, String colId) {
     final controller = ref.read(projectControllerProvider.notifier);
     final dirty = state.dirtyCells.contains((e.key, colId.startsWith('loc_') ? colId.substring(4) : state.baseLocale));
     final isError = colId.startsWith('loc_') && state.errorCells.contains((e.key, colId.substring(4)));
     final isSourceChanged = state.sourceChangedKeys.contains(e.key);
-    final activeTranslating = ref.watch(activeCellTranslationProvider);
-    final isTranslating = colId.startsWith('loc_') && activeTranslating == (e.key, colId.substring(4));
+    // Используем переданное значение вместо ref.watch()
+    final isTranslating = colId.startsWith('loc_') && activeTranslatingCell == (e.key, colId.substring(4));
+    // Проверяем, редактируется ли эта ячейка
+    final isEditing = editingCell == (e.key, colId);
 
     Color bg = Colors.transparent;
     if (isError) {
@@ -62,7 +70,7 @@ class TableCellBuilder {
       ),
       child: Stack(
         children: [
-          _buildCellContent(e, colId, bg, controller, isSourceChanged),
+          _buildCellContent(e, colId, bg, controller, isSourceChanged, isEditing),
           if (isTranslating) const Positioned(top: 2, left: 4, width: 12, height: 12, child: _MiniSpinner()),
         ],
       ),
@@ -75,7 +83,16 @@ class TableCellBuilder {
     Color bg,
     ProjectController controller,
     bool isSourceChanged,
+    bool isEditing,
   ) {
+    // Колбеки для редактирования
+    void startEditing() {
+      ref.read(editingCellProvider.notifier).startEditing(e.key, colId);
+    }
+    void stopEditing() {
+      ref.read(editingCellProvider.notifier).stopEditing();
+    }
+
     switch (colId) {
       case 'key':
         return Stack(
@@ -84,6 +101,7 @@ class TableCellBuilder {
               width: colWidths[colId]! - 1,
               text: e.key,
               editable: true,
+              isEditing: isEditing,
               centerVertically: true,
               background: bg,
               onCommit: (v) {
@@ -94,6 +112,8 @@ class TableCellBuilder {
               },
               onSecondaryTapDown: (d) => onShowCellMenu(position: d.globalPosition, entry: e, colId: colId),
               onTap: () => onToggleSelection(e.key, add: false),
+              onStartEditing: startEditing,
+              onStopEditing: stopEditing,
               horizontalScrollController: horizontalScrollController,
             ),
             if (isSourceChanged)
@@ -141,11 +161,14 @@ class TableCellBuilder {
             width: colWidths[colId]! - 1,
             text: value,
             editable: true,
+            isEditing: isEditing,
             multiline: true,
             background: bg,
             onCommit: (v) => controller.updateCell(key: e.key, locale: locale, text: v),
             onSecondaryTapDown: (d) => onShowCellMenu(position: d.globalPosition, entry: e, colId: colId),
             onTap: () => onToggleSelection(e.key, add: !isBase),
+            onStartEditing: startEditing,
+            onStopEditing: stopEditing,
             horizontalScrollController: horizontalScrollController,
           );
         }

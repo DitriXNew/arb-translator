@@ -20,4 +20,15 @@ class OfflinePassthroughStrategy implements AiTranslationStrategy {
     String? description,
     String? glossaryPrompt,
   }) async => englishText;
+
+  @override
+  Future<Map<String, String>> translateBatch({
+    required String apiKey,
+    required List<BatchTranslationItem> items,
+    required String targetLocale,
+    String? glossaryPrompt,
+  }) async {
+    // Offline: возвращаем оригинальные тексты
+    return {for (final item in items) item.key: item.text};
+  }
 }

@@ -24,6 +24,18 @@ class _MockStrategy implements AiTranslationStrategy {
   }) async {
     return '$englishText<$targetLocale>';
   }
+
+  @override
+  Future<Map<String, String>> translateBatch({
+    required String apiKey,
+    required List<BatchTranslationItem> items,
+    required String targetLocale,
+    String? glossaryPrompt,
+  }) async {
+    return {
+      for (final item in items) item.key: '${item.text}<$targetLocale>',
+    };
+  }
 }
 
 class _FakeAiSettings extends AiSettingsNotifier {
