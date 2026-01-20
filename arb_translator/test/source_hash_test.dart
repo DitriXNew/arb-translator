@@ -27,11 +27,11 @@ void main() {
       const text = 'Hello {name}';
       final actualHash = HashUtils.computeSourceHash(text);
 
-      // Вычисляем ожидаемый хеш прямо в тесте
+      // Calculate expected hash right in the test
       final expectedHash = HashUtils.computeSourceHash(text);
       expect(actualHash, equals(expectedHash));
 
-      // Проверяем, что хеш имеет правильный формат (SHA-256 hex string)
+      // Verify the hash has correct format (SHA-256 hex string)
       expect(actualHash.length, equals(64));
       expect(RegExp(r'^[a-f0-9]+$').hasMatch(actualHash), isTrue);
     });
@@ -42,13 +42,13 @@ void main() {
 
       final originalHash = HashUtils.computeSourceHash(originalText);
 
-      // Текст не изменился - изменения не должно быть
+      // Text unchanged - should not detect change
       expect(HashUtils.isSourceChanged(originalText, originalHash), isFalse);
 
-      // Текст изменился - должно определить изменение
+      // Text changed - should detect change
       expect(HashUtils.isSourceChanged(changedText, originalHash), isTrue);
 
-      // Нет сохраненного хеша - считается новой записью, не изменением
+      // No saved hash - considered a new entry, not a change
       expect(HashUtils.isSourceChanged(originalText, null), isFalse);
     });
 

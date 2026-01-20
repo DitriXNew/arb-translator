@@ -29,9 +29,11 @@ class TableCellBuilder {
   onShowCellMenu;
   final void Function(String key, {required bool add}) onToggleSelection;
   final ScrollController horizontalScrollController;
-  /// Активная ячейка, которая сейчас переводится (key, locale)
+
+  /// Active cell that is currently being translated (key, locale)
   final (String, String)? activeTranslatingCell;
-  /// Активная редактируемая ячейка (key, colId)
+
+  /// Active editing cell (key, colId)
   final (String, String)? editingCell;
 
   Widget buildCell(TranslationEntry e, String colId) {
@@ -39,9 +41,9 @@ class TableCellBuilder {
     final dirty = state.dirtyCells.contains((e.key, colId.startsWith('loc_') ? colId.substring(4) : state.baseLocale));
     final isError = colId.startsWith('loc_') && state.errorCells.contains((e.key, colId.substring(4)));
     final isSourceChanged = state.sourceChangedKeys.contains(e.key);
-    // Используем переданное значение вместо ref.watch()
+    // Use passed value instead of ref.watch()
     final isTranslating = colId.startsWith('loc_') && activeTranslatingCell == (e.key, colId.substring(4));
-    // Проверяем, редактируется ли эта ячейка
+    // Check if this cell is being edited
     final isEditing = editingCell == (e.key, colId);
 
     Color bg = Colors.transparent;
@@ -85,10 +87,11 @@ class TableCellBuilder {
     bool isSourceChanged,
     bool isEditing,
   ) {
-    // Колбеки для редактирования
+    // Callbacks for editing
     void startEditing() {
       ref.read(editingCellProvider.notifier).startEditing(e.key, colId);
     }
+
     void stopEditing() {
       ref.read(editingCellProvider.notifier).stopEditing();
     }

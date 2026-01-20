@@ -39,7 +39,7 @@ class OpenAiTranslationStrategy implements AiTranslationStrategy {
     required String targetLocale,
     String? glossaryPrompt,
   }) {
-    // Конвертируем BatchTranslationItem в TranslationItem для datasource
+    // Convert BatchTranslationItem to TranslationItem for datasource
     final dsItems = items
         .map((item) => TranslationItem(key: item.key, text: item.text, description: item.description))
         .toList();

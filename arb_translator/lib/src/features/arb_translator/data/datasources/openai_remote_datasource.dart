@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:arb_translator/src/core/services/log_service.dart';
 import 'package:http/http.dart' as http;
 
-/// Элемент для батчевого перевода
+/// Item for batch translation
 class TranslationItem {
   const TranslationItem({required this.key, required this.text, this.description});
 
@@ -15,7 +15,7 @@ class OpenAiRemoteDataSource {
   OpenAiRemoteDataSource(this.client);
   final http.Client client;
 
-  /// Размер батча для structured output
+  /// Batch size for structured output
   static const int batchSize = 100;
 
   Future<String> translate({
@@ -106,8 +106,8 @@ class OpenAiRemoteDataSource {
     return gptModels;
   }
 
-  /// Батчевый перевод с использованием structured output (JSON schema)
-  /// Возвращает Map<key, translation>
+  /// Batch translation using structured output (JSON schema)
+  /// Returns `Map<key, translation>`
   Future<Map<String, String>> translateBatch({
     required String apiKey,
     required List<TranslationItem> items,
@@ -122,7 +122,7 @@ class OpenAiRemoteDataSource {
 
     final uri = endpoint ?? Uri.parse('https://api.openai.com/v1/chat/completions');
 
-    // Формируем список текстов для перевода
+    // Build list of texts for translation
     final textsToTranslate = <Map<String, dynamic>>[
       for (final item in items)
         {
@@ -132,9 +132,10 @@ class OpenAiRemoteDataSource {
         },
     ];
 
-    // System prompt для перевода
+    // System prompt for translation
     final systemPrompt =
-        '''You are a professional translator for software localization.
+        '''
+You are a professional translator for software localization.
 Translate the provided texts from English to $targetLocale.
 ${glossaryPrompt != null && glossaryPrompt.isNotEmpty ? 'Glossary and style guide:\n$glossaryPrompt\n' : ''}
 IMPORTANT:
@@ -143,12 +144,14 @@ IMPORTANT:
 - Translate naturally for the target locale
 - Return translations for ALL provided keys''';
 
-    // User prompt с JSON данными
-    final userPrompt = '''Translate the following ${items.length} texts:
+    // User prompt with JSON data
+    final userPrompt =
+        '''
+Translate the following ${items.length} texts:
 
 ${jsonEncode(textsToTranslate)}''';
 
-    // JSON Schema для structured output
+    // JSON Schema for structured output
     final jsonSchema = {
       'name': 'translations',
       'strict': true,
@@ -211,7 +214,7 @@ ${jsonEncode(textsToTranslate)}''';
       await Future.delayed(Duration(seconds: delaySeconds));
     }
 
-    // Парсим ответ
+    // Parse response
     final data = jsonDecode(resp.body) as Map<String, dynamic>;
     final choices = data['choices'];
     if (choices is! List || choices.isEmpty) {
@@ -224,7 +227,7 @@ ${jsonEncode(textsToTranslate)}''';
       throw Exception('Invalid AI response: no content');
     }
 
-    // Парсим structured output
+    // Parse structured output
     final translationsData = jsonDecode(content) as Map<String, dynamic>;
     final translationsList = translationsData['translations'] as List?;
     if (translationsList == null) {

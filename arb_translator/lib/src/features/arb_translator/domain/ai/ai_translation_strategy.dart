@@ -1,4 +1,4 @@
-/// Элемент для батчевого перевода
+/// Item for batch translation
 class BatchTranslationItem {
   const BatchTranslationItem({required this.key, required this.text, this.description});
 
@@ -8,7 +8,7 @@ class BatchTranslationItem {
 }
 
 abstract class AiTranslationStrategy {
-  /// Перевод одной строки (legacy метод для совместимости)
+  /// Translate a single string (legacy method for compatibility)
   Future<String> translate({
     required String apiKey,
     required String englishText,
@@ -17,8 +17,8 @@ abstract class AiTranslationStrategy {
     String? glossaryPrompt,
   });
 
-  /// Батчевый перевод нескольких строк с использованием structured output
-  /// Возвращает Map<key, translation>
+  /// Batch translation of multiple strings using structured output
+  /// Returns `Map<key, translation>`
   Future<Map<String, String>> translateBatch({
     required String apiKey,
     required List<BatchTranslationItem> items,

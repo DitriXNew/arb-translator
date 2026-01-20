@@ -32,9 +32,7 @@ class _MockStrategy implements AiTranslationStrategy {
     required String targetLocale,
     String? glossaryPrompt,
   }) async {
-    return {
-      for (final item in items) item.key: '${item.text}<$targetLocale>',
-    };
+    return {for (final item in items) item.key: '${item.text}<$targetLocale>'};
   }
 }
 

@@ -25,7 +25,7 @@ void main() {
     });
 
     test('should detect source changes when hash differs', () async {
-      // Создаем файл с хешем для старого текста
+      // Create file with hash for old text
       final oldText = 'Hello {name}';
       final oldHash = HashUtils.computeSourceHash(oldText);
 
@@ -46,15 +46,15 @@ void main() {
 }
 ''');
 
-      final ruFile = File('${tempDir.path}/app_ru.arb');
+      final ruFile = File('${tempDir.path}/app_de.arb');
       await ruFile.writeAsString('''
 {
-  "@@locale": "ru",
-  "greeting": "Привет {name}"
+  "@@locale": "de",
+  "greeting": "Hallo {name}"
 }
 ''');
 
-      // Загружаем данные
+      // Load data
       final loader = LoadArbFolder(repository);
       final (baseLocale, locales, entries) = await loader(tempDir.path);
       expect(entries, hasLength(1));
@@ -63,14 +63,14 @@ void main() {
       expect(entry.key, equals('greeting'));
       expect(entry.values[baseLocale], equals('Hi {name}'));
 
-      // Проверяем, что хеш отличается от сохраненного
+      // Verify the hash differs from saved
       final currentHash = HashUtils.computeSourceHash(entry.values[baseLocale] ?? '');
       expect(entry.meta.sourceHash, equals(oldHash));
       expect(currentHash, isNot(equals(oldHash)));
     });
 
     test('should save updated hashes when committing', () async {
-      // Создаем файл без хешей
+      // Create file without hashes
       final enFile = File('${tempDir.path}/app_en.arb');
       await enFile.writeAsString('''
 {
@@ -96,21 +96,21 @@ void main() {
 }
 ''');
 
-      final ruFile = File('${tempDir.path}/app_ru.arb');
+      final ruFile = File('${tempDir.path}/app_de.arb');
       await ruFile.writeAsString('''
 {
-  "@@locale": "ru",
-  "greeting": "Привет {name}",
-  "farewell": "До свидания {name}"
+  "@@locale": "de",
+  "greeting": "Hallo {name}",
+  "farewell": "Auf Wiedersehen {name}"
 }
 ''');
 
-      // Загружаем данные
+      // Load data
       final loader = LoadArbFolder(repository);
       final (baseLocale, locales, entries) = await loader(tempDir.path);
       expect(entries, hasLength(2));
 
-      // Обновляем хеши для всех записей
+      // Update hashes for all entries
       final updatedEntries = entries.map((entry) {
         final sourceText = entry.values[baseLocale] ?? '';
         if (sourceText.isNotEmpty) {
@@ -120,13 +120,13 @@ void main() {
         return entry;
       }).toList();
 
-      // Сохраняем обновленные данные
+      // Save updated data
       for (final locale in locales) {
         final data = dataSource.serializeLocale(entries: updatedEntries, locale: locale, baseLocale: baseLocale);
         await dataSource.writeArb(folderPath: tempDir.path, locale: locale, data: data);
       }
 
-      // Перезагружаем и проверяем, что хеши сохранились
+      // Reload and verify hashes are saved
       final (_, _, reloadedEntries) = await loader(tempDir.path);
       expect(reloadedEntries, hasLength(2));
 
@@ -139,7 +139,7 @@ void main() {
     });
 
     test('should preserve existing metadata when adding source hash', () async {
-      // Создаем файл с существующими метаданными
+      // Create file with existing metadata
       final enFile = File('${tempDir.path}/app_en.arb');
       await enFile.writeAsString('''
 {
@@ -156,26 +156,26 @@ void main() {
 }
 ''');
 
-      // Загружаем данные
+      // Load data
       final loader = LoadArbFolder(repository);
       final (baseLocale, locales, entries) = await loader(tempDir.path);
       expect(entries, hasLength(1));
 
       final entry = entries.first;
 
-      // Добавляем хеш
+      // Add hash
       final sourceText = entry.values[baseLocale] ?? '';
       final newHash = HashUtils.computeSourceHash(sourceText);
       final updatedEntry = entry.copyWith(meta: entry.meta.copyWith(sourceHash: newHash));
 
-      // Сохраняем
+      // Save
       for (final locale in locales) {
         final entries = [updatedEntry];
         final data = dataSource.serializeLocale(entries: entries, locale: locale, baseLocale: baseLocale);
         await dataSource.writeArb(folderPath: tempDir.path, locale: locale, data: data);
       }
 
-      // Проверяем, что стандартные метаданные сохранились
+      // Verify standard metadata is preserved
       final content = await enFile.readAsString();
       expect(content, contains('"description": "A greeting message"'));
       expect(content, contains('"placeholders":'));

@@ -35,7 +35,7 @@ class TranslationProgress extends Notifier<TranslationProgressState> {
     }
   }
 
-  /// Обновить количество завершённых
+  /// Update the completed count
   void updateDone(int done) {
     state = state.copyWith(done: done);
   }

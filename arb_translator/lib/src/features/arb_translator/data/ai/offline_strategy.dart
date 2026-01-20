@@ -27,8 +27,5 @@ class OfflinePassthroughStrategy implements AiTranslationStrategy {
     required List<BatchTranslationItem> items,
     required String targetLocale,
     String? glossaryPrompt,
-  }) async {
-    // Offline: возвращаем оригинальные тексты
-    return {for (final item in items) item.key: item.text};
-  }
+  }) async => {for (final item in items) item.key: item.text};
 }

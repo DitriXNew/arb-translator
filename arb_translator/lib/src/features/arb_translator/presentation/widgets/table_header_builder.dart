@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:arb_translator/src/core/theme/color_tokens.dart';
-import 'package:arb_translator/src/core/theme/text_styles.dart';import 'package:arb_translator/src/features/arb_translator/presentation/providers/locale_translation_progress_provider.dart';import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
+import 'package:arb_translator/src/core/theme/text_styles.dart';
+import 'package:arb_translator/src/features/arb_translator/presentation/providers/locale_translation_progress_provider.dart';
+import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,7 +37,7 @@ class TableHeaderBuilder {
     final canTranslateBulk = colId.startsWith('loc_') && !isBase;
     final color = sorted ? AppColors.accent : AppColors.textPrimary;
 
-    // Проверяем прогресс перевода для данного языка
+    // Check translation progress for this locale
     final locale = colId.startsWith('loc_') ? colId.substring(4) : null;
     final progressState = ref.watch(localeTranslationProgressProvider);
     final localeProgress = locale != null ? progressState.getProgress(locale) : null;
@@ -56,7 +58,7 @@ class TableHeaderBuilder {
         ),
         child: Row(
           children: [
-            // Индикатор загрузки слева от языка
+            // Loading indicator to the left of locale
             if (isTranslating) ...[
               const SizedBox(
                 width: 14,
@@ -68,7 +70,7 @@ class TableHeaderBuilder {
               ),
               const SizedBox(width: 6),
             ],
-            // Название колонки
+            // Column name
             Expanded(
               child: Row(
                 children: [
@@ -87,18 +89,15 @@ class TableHeaderBuilder {
                 ],
               ),
             ),
-            // Счётчик прогресса и кнопка отмены
+            // Progress counter and cancel button
             if (isTranslating && localeProgress != null) ...[
               Text(
                 '${localeProgress.done}/${localeProgress.total}',
-                style: AppTextStyles.tableHeader13.copyWith(
-                  color: AppColors.textSecondary,
-                  fontSize: 11,
-                ),
+                style: AppTextStyles.tableHeader13.copyWith(color: AppColors.textSecondary, fontSize: 11),
               ),
               const SizedBox(width: 4),
               Tooltip(
-                message: 'Остановить запуск следующих батчей',
+                message: 'Stop launching next batches',
                 child: InkWell(
                   onTap: () {
                     ref.read(localeTranslationProgressProvider.notifier).requestCancel(locale!);
@@ -106,16 +105,12 @@ class TableHeaderBuilder {
                   borderRadius: BorderRadius.circular(10),
                   child: const Padding(
                     padding: EdgeInsets.all(2),
-                    child: Icon(
-                      Icons.close,
-                      size: 14,
-                      color: Colors.redAccent,
-                    ),
+                    child: Icon(Icons.close, size: 14, color: Colors.redAccent),
                   ),
                 ),
               ),
             ],
-            // Кнопки перевода (только если не идёт перевод)
+            // Translation buttons (only if not translating)
             if (canTranslateBulk && !isTranslating) ..._buildTranslationActions(colId),
             _buildResizeHandle(colId),
           ],

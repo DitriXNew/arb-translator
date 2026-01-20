@@ -18,7 +18,7 @@ void main() {
     setUp(() async {
       tempDir = await Directory.systemTemp.createTemp('arb_hash_test');
       // Initial English ARB with sourceHash
-      // Правильный хеш для "Welcome to our app"
+      // Correct hash for "Welcome to our app"
       final correctHash = HashUtils.computeSourceHash("Welcome to our app");
 
       await File(p.join(tempDir.path, 'app_en.arb')).writeAsString('''{

@@ -30,9 +30,7 @@ class _MockStrategy implements AiTranslationStrategy {
     required String targetLocale,
     String? glossaryPrompt,
   }) async {
-    return {
-      for (final item in items) item.key: '[${targetLocale.toUpperCase()}] ${item.text}',
-    };
+    return {for (final item in items) item.key: '[${targetLocale.toUpperCase()}] ${item.text}'};
   }
 }
 

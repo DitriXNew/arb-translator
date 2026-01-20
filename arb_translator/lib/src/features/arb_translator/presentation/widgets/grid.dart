@@ -111,9 +111,9 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
   Widget build(BuildContext context) {
     final state = ref.watch(projectControllerProvider);
     final entriesFiltered = ref.watch(filteredEntriesProvider);
-    // Получаем активную ячейку перевода один раз для всего грида
+    // Get active translating cell once for the whole grid
     final activeTranslatingCell = ref.watch(activeCellTranslationProvider);
-    // Получаем активную редактируемую ячейку
+    // Get active editing cell
     final editingCell = ref.watch(editingCellProvider);
 
     _ensureLocaleWidths(state);
@@ -210,10 +210,7 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
                       child: OverflowBox(
                         maxWidth: double.infinity,
                         alignment: Alignment.centerLeft,
-                        child: Transform.translate(
-                          offset: Offset(-offset, 0),
-                          child: child,
-                        ),
+                        child: Transform.translate(offset: Offset(-offset, 0), child: child),
                       ),
                     );
                   },
@@ -268,10 +265,7 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
                                 child: OverflowBox(
                                   maxWidth: double.infinity,
                                   alignment: Alignment.centerLeft,
-                                  child: Transform.translate(
-                                    offset: Offset(-offset, 0),
-                                    child: child,
-                                  ),
+                                  child: Transform.translate(offset: Offset(-offset, 0), child: child),
                                 ),
                               );
                             },

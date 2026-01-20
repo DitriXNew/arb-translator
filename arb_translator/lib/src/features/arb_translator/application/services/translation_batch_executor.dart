@@ -11,7 +11,7 @@ import 'package:arb_translator/src/features/arb_translator/presentation/provider
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/translation_progress_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Размер батча для перевода
+/// Batch size for translation
 const int kTranslationBatchSize = 100;
 
 /// Encapsulates bulk AI translation logic with batch processing.
@@ -41,7 +41,7 @@ class TranslationBatchExecutor {
     final strategy = ref.read(currentAiStrategyProvider);
     final entries = controller.entries;
 
-    // Фильтруем кандидатов для перевода
+    // Filter candidates for translation
     final candidates = <TranslationEntry>[
       for (final e in entries)
         if ((e.values[baseLocale] ?? '').isNotEmpty)
@@ -55,18 +55,18 @@ class TranslationBatchExecutor {
 
     logInfo('Found ${candidates.length} entries for batch translation (total entries: ${entries.length})');
 
-    // Инициализируем прогресс для данного языка
+    // Initialize progress for this locale
     final localeProgress = ref.read(localeTranslationProgressProvider.notifier);
     final globalProgress = ref.read(translationProgressProvider.notifier);
 
-    // Очищаем предыдущие ошибки
+    // Clear previous errors
     ref.read(aiErrorsProvider.notifier).clear();
 
-    // Запускаем прогресс
+    // Start progress
     localeProgress.start(targetLocale, candidates.length);
     globalProgress.start(candidates.length);
 
-    // Разбиваем на батчи по kTranslationBatchSize
+    // Split into batches of kTranslationBatchSize
     final batches = <List<TranslationEntry>>[];
     for (var i = 0; i < candidates.length; i += kTranslationBatchSize) {
       batches.add(candidates.sublist(i, (i + kTranslationBatchSize).clamp(0, candidates.length)));
@@ -77,7 +77,7 @@ class TranslationBatchExecutor {
     var totalProcessed = 0;
 
     for (var batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-      // Проверяем отмену
+      // Check for cancellation
       final progressState = ref.read(localeTranslationProgressProvider);
       if (progressState.isCancelRequested(targetLocale)) {
         logInfo('Batch translation cancelled by user after batch $batchIndex');
@@ -88,7 +88,7 @@ class TranslationBatchExecutor {
       logDebug('Processing batch ${batchIndex + 1}/${batches.length} with ${batch.length} items');
 
       try {
-        // Подготавливаем items для батча
+        // Prepare items for batch
         final batchItems = batch
             .map(
               (e) =>
@@ -96,7 +96,7 @@ class TranslationBatchExecutor {
             )
             .toList();
 
-        // Выполняем батчевый перевод
+        // Execute batch translation
         final translations = await strategy.translateBatch(
           apiKey: apiKey,
           items: batchItems,
@@ -104,7 +104,7 @@ class TranslationBatchExecutor {
           glossaryPrompt: glossary,
         );
 
-        // Применяем переводы
+        // Apply translations
         final projectController = ref.read(projectControllerProvider.notifier);
         for (final entry in batch) {
           final translation = translations[entry.key];
@@ -129,14 +129,14 @@ class TranslationBatchExecutor {
       } catch (ex, st) {
         logError('Batch ${batchIndex + 1} failed', ex, st);
 
-        // Добавляем ошибки для всех элементов батча
+        // Add errors for all batch items
         for (final entry in batch) {
           ref
               .read(aiErrorsProvider.notifier)
               .add(key: entry.key, locale: targetLocale, message: 'Batch translation failed: $ex');
         }
 
-        // Обновляем прогресс даже при ошибке
+        // Update progress even on error
         totalProcessed += batch.length;
         localeProgress.updateProgress(targetLocale, totalProcessed);
         globalProgress.updateDone(totalProcessed);
@@ -148,7 +148,7 @@ class TranslationBatchExecutor {
       'Batch translation completed: processed ${finalProgress?.done ?? totalProcessed}/${candidates.length} items',
     );
 
-    // Завершаем прогресс
+    // Finish progress
     localeProgress.finish(targetLocale);
     globalProgress.finish();
   }

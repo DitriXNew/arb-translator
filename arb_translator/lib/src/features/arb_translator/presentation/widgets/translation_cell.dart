@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:arb_translator/src/core/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 
-/// Облегчённая ячейка таблицы, которая показывает TextField только при фокусе.
-/// Когда ячейка не в фокусе - показывает простой Text для экономии ресурсов.
+/// Lightweight table cell that shows TextField only when focused.
+/// When the cell is not focused - shows simple Text to save resources.
 class TranslationCell extends StatefulWidget {
   const TranslationCell({
     required this.width,
@@ -29,14 +29,17 @@ class TranslationCell extends StatefulWidget {
   final bool multiline;
   final bool centerVertically;
   final Color background;
-  /// Показывать ли TextField (true) или Text (false)
+
+  /// Whether to show TextField (true) or Text (false)
   final bool isEditing;
   final void Function(String value)? onCommit;
   final void Function(TapDownDetails)? onSecondaryTapDown;
   final VoidCallback? onTap;
-  /// Колбек когда пользователь кликает для начала редактирования
+
+  /// Callback when user clicks to start editing
   final VoidCallback? onStartEditing;
-  /// Колбек когда редактирование заканчивается
+
+  /// Callback when editing ends
   final VoidCallback? onStopEditing;
   final ScrollController? horizontalScrollController;
 
@@ -81,13 +84,13 @@ class _TranslationCellState extends State<TranslationCell> {
   @override
   void didUpdateWidget(covariant TranslationCell oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
-    // Переключение режима редактирования
+
+    // Toggle editing mode
     if (widget.isEditing && !oldWidget.isEditing) {
       _createEditingState();
       _controller!.text = widget.text;
       _initial = widget.text;
-      // Автофокус при начале редактирования
+      // Autofocus when starting to edit
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _focusNode?.requestFocus();
         _scrollIntoView();
@@ -96,8 +99,8 @@ class _TranslationCellState extends State<TranslationCell> {
       _maybeCommit();
       _disposeEditingState();
     }
-    
-    // Обновление текста если изменился снаружи
+
+    // Update text if changed externally
     if (widget.isEditing && _controller != null) {
       if (oldWidget.text != widget.text && widget.text != _controller!.text) {
         final sel = _controller!.selection;
@@ -156,9 +159,9 @@ class _TranslationCellState extends State<TranslationCell> {
   @override
   Widget build(BuildContext context) {
     Widget child;
-    
+
     if (widget.isEditing && _controller != null) {
-      // Режим редактирования - показываем TextField
+      // Editing mode - show TextField
       child = TextField(
         controller: _controller,
         focusNode: _focusNode,
@@ -187,7 +190,7 @@ class _TranslationCellState extends State<TranslationCell> {
         contextMenuBuilder: (context, editableTextState) => const SizedBox.shrink(),
       );
     } else {
-      // Режим просмотра - показываем лёгкий Text
+      // View mode - show lightweight Text
       child = Padding(
         padding: const EdgeInsets.all(8),
         child: Align(
@@ -205,12 +208,7 @@ class _TranslationCellState extends State<TranslationCell> {
     return GestureDetector(
       onTap: _handleTap,
       onSecondaryTapDown: widget.onSecondaryTapDown,
-      child: Container(
-        width: widget.width,
-        height: double.infinity,
-        color: widget.background,
-        child: child,
-      ),
+      child: Container(width: widget.width, height: double.infinity, color: widget.background, child: child),
     );
   }
 }

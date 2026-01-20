@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Состояние прогресса перевода для одного языка
+/// Translation progress state for a single locale
 class LocaleTranslationProgress {
   const LocaleTranslationProgress({
     this.isTranslating = false,
@@ -25,42 +25,42 @@ class LocaleTranslationProgress {
       );
 }
 
-/// Состояние прогресса перевода для всех языков
+/// Translation progress state for all locales
 class LocaleTranslationProgressState {
   const LocaleTranslationProgressState({this.localeProgress = const {}});
 
   /// Map: locale -> progress state
   final Map<String, LocaleTranslationProgress> localeProgress;
 
-  /// Проверяет, идёт ли перевод для данного языка
+  /// Checks if translation is in progress for the given locale
   bool isTranslating(String locale) => localeProgress[locale]?.isTranslating ?? false;
 
-  /// Проверяет, запрошена ли отмена для данного языка
+  /// Checks if cancellation was requested for the given locale
   bool isCancelRequested(String locale) => localeProgress[locale]?.cancelRequested ?? false;
 
-  /// Получает прогресс для языка
+  /// Gets progress for a locale
   LocaleTranslationProgress? getProgress(String locale) => localeProgress[locale];
 
-  /// Есть ли активные переводы
+  /// Whether there are any active translations
   bool get hasActiveTranslations => localeProgress.values.any((p) => p.isTranslating);
 
   LocaleTranslationProgressState copyWith({Map<String, LocaleTranslationProgress>? localeProgress}) =>
       LocaleTranslationProgressState(localeProgress: localeProgress ?? this.localeProgress);
 }
 
-/// Notifier для управления прогрессом перевода по языкам
+/// Notifier for managing translation progress by locale
 class LocaleTranslationProgressNotifier extends Notifier<LocaleTranslationProgressState> {
   @override
   LocaleTranslationProgressState build() => const LocaleTranslationProgressState();
 
-  /// Начать перевод для языка
+  /// Start translation for a locale
   void start(String locale, int total) {
     final newProgress = Map<String, LocaleTranslationProgress>.from(state.localeProgress);
     newProgress[locale] = LocaleTranslationProgress(isTranslating: true, total: total);
     state = state.copyWith(localeProgress: newProgress);
   }
 
-  /// Обновить прогресс для языка (добавить завершённые)
+  /// Update progress for a locale (add completed count)
   void updateProgress(String locale, int done) {
     final current = state.localeProgress[locale];
     if (current == null) return;
@@ -70,7 +70,7 @@ class LocaleTranslationProgressNotifier extends Notifier<LocaleTranslationProgre
     state = state.copyWith(localeProgress: newProgress);
   }
 
-  /// Увеличить счётчик на указанное количество
+  /// Increment progress counter by specified amount
   void incrementProgress(String locale, int count) {
     final current = state.localeProgress[locale];
     if (current == null) return;
@@ -80,7 +80,7 @@ class LocaleTranslationProgressNotifier extends Notifier<LocaleTranslationProgre
     state = state.copyWith(localeProgress: newProgress);
   }
 
-  /// Запросить отмену перевода для языка
+  /// Request cancellation of translation for a locale
   void requestCancel(String locale) {
     final current = state.localeProgress[locale];
     if (current == null || !current.isTranslating) return;
@@ -90,14 +90,14 @@ class LocaleTranslationProgressNotifier extends Notifier<LocaleTranslationProgre
     state = state.copyWith(localeProgress: newProgress);
   }
 
-  /// Завершить перевод для языка
+  /// Finish translation for a locale
   void finish(String locale) {
     final newProgress = Map<String, LocaleTranslationProgress>.from(state.localeProgress);
     newProgress.remove(locale);
     state = state.copyWith(localeProgress: newProgress);
   }
 
-  /// Завершить все переводы
+  /// Finish all translations
   void finishAll() {
     state = const LocaleTranslationProgressState();
   }
