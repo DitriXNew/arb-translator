@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:arb_translator/src/core/services/log_service.dart';
+import 'package:arb_translator/src/features/arb_translator/domain/entities/ai_settings.dart';
 import 'package:http/http.dart' as http;
 
 /// Item for batch translation
@@ -21,7 +22,7 @@ class OpenAiRemoteDataSource {
   Future<String> translate({
     required String apiKey,
     required String prompt,
-    String model = 'gpt-4.1-mini',
+    String model = kDefaultAiModel,
     Uri? endpoint,
   }) async {
     logDebug('Starting OpenAI translation request: model=$model');
@@ -113,7 +114,7 @@ class OpenAiRemoteDataSource {
     required List<TranslationItem> items,
     required String targetLocale,
     String? glossaryPrompt,
-    String model = 'gpt-4.1-mini',
+    String model = kDefaultAiModel,
     Uri? endpoint,
   }) async {
     if (items.isEmpty) return {};

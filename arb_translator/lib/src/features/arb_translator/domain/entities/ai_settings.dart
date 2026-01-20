@@ -1,8 +1,11 @@
+/// Default AI model used for translations
+const String kDefaultAiModel = 'gpt-5-mini';
+
 class AiSettings {
   const AiSettings({
     this.apiKeyMasked,
     this.glossaryPrompt = '',
-    this.openAiModel = 'gpt-5-mini', // fixed
+    this.openAiModel = kDefaultAiModel,
   });
   final String? apiKeyMasked;
   final String glossaryPrompt;

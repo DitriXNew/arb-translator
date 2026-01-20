@@ -29,6 +29,6 @@ void main() {
 
     // Ensure no TextFormField placeholder for model nor Slider present.
     expect(find.byType(Slider), findsNothing);
-    expect(find.widgetWithText(TextFormField, 'gpt-4o-mini'), findsNothing);
+    expect(find.widgetWithText(TextFormField, 'gpt-5-mini'), findsNothing);
   });
 }

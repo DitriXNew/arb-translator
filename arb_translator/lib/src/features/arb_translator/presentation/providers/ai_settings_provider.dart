@@ -18,7 +18,7 @@ class AiSettingsNotifier extends Notifier<AiSettings> {
   AiSettings build() {
     _storage = const FlutterSecureStorage();
     _load();
-    // openAiModel fixed in entity defaults (gpt-5)
+    // openAiModel is fixed via kDefaultAiModel constant
     return const AiSettings();
   }
 

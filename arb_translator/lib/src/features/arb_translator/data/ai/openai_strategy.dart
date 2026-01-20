@@ -28,7 +28,7 @@ class OpenAiTranslationStrategy implements AiTranslationStrategy {
       description: description,
       glossary: glossaryPrompt,
     );
-    // Hard-coded model (gpt-4.1-mini) per current specification.
+    // Model is set via kDefaultAiModel constant in openai_remote_datasource.dart
     return _ds.translate(apiKey: apiKey, prompt: prompt);
   }
 
