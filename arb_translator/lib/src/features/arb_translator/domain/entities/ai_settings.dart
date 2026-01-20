@@ -2,11 +2,7 @@
 const String kDefaultAiModel = 'gpt-5-mini';
 
 class AiSettings {
-  const AiSettings({
-    this.apiKeyMasked,
-    this.glossaryPrompt = '',
-    this.openAiModel = kDefaultAiModel,
-  });
+  const AiSettings({this.apiKeyMasked, this.glossaryPrompt = '', this.openAiModel = kDefaultAiModel});
   final String? apiKeyMasked;
   final String glossaryPrompt;
   // Model now fixed (no user editing / persistence)
