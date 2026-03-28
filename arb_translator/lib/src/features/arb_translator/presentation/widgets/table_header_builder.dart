@@ -164,7 +164,7 @@ class TableHeaderBuilder {
       width: 32,
       height: 32,
       child: Tooltip(
-        message: 'Translate empty only',
+        message: 'Translate empty or changed',
         child: IconButton(
           iconSize: 16,
           padding: EdgeInsets.zero,

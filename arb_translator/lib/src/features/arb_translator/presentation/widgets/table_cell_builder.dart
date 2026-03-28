@@ -46,11 +46,20 @@ class TableCellBuilder {
     // Check if this cell is being edited
     final isEditing = editingCell == (e.key, colId);
 
+    // Stale translation: source EN text changed after this locale was translated.
+    final isStaleTranslation =
+        isSourceChanged &&
+        colId.startsWith('loc_') &&
+        colId.substring(4) != state.baseLocale &&
+        (e.values[colId.substring(4)] ?? '').isNotEmpty;
+
     Color bg = Colors.transparent;
     if (isError) {
       bg = AppColors.danger.withValues(alpha: 0.15);
     } else if (dirty) {
       bg = AppColors.rowHover.withValues(alpha: 0.35);
+    } else if (isStaleTranslation) {
+      bg = AppColors.warning.withValues(alpha: 0.13);
     }
 
     if (isTranslating) {

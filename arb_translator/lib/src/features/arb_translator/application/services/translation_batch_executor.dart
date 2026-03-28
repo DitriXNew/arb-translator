@@ -21,7 +21,7 @@ class TranslationBatchExecutor {
   final Ref ref;
 
   Future<void> run({required String targetLocale, required bool onlyEmpty}) async {
-    logInfo('Starting batch translation: locale=$targetLocale, onlyEmpty=$onlyEmpty');
+    logInfo('Starting batch translation: locale=$targetLocale, onlyEmptyOrChanged=$onlyEmpty');
 
     final controller = ref.read(projectControllerProvider);
     final baseLocale = controller.baseLocale;
@@ -41,11 +41,14 @@ class TranslationBatchExecutor {
     final strategy = ref.read(currentAiStrategyProvider);
     final entries = controller.entries;
 
-    // Filter candidates for translation
+    // Filter candidates for translation.
+    // In onlyEmpty mode: include keys with no translation OR where the EN source has changed
+    // (so stale translations get refreshed automatically alongside empty ones).
+    final sourceChangedKeys = controller.sourceChangedKeys;
     final candidates = <TranslationEntry>[
       for (final e in entries)
         if ((e.values[baseLocale] ?? '').isNotEmpty)
-          if (!onlyEmpty || (e.values[targetLocale] ?? '').isEmpty) e,
+          if (!onlyEmpty || (e.values[targetLocale] ?? '').isEmpty || sourceChangedKeys.contains(e.key)) e,
     ];
 
     if (candidates.isEmpty) {

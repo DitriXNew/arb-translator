@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:arb_translator/src/core/services/log_service.dart';
+import 'package:arb_translator/src/core/utils/hash_utils.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/entities/entry_metadata.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/entities/translation_entry.dart';
 
@@ -122,17 +123,26 @@ class ArbFileDataSource {
       if (locale != baseLocale && value.isEmpty) continue;
       // Add the translation value first
       map[e.key] = value;
-      // Only base locale file carries metadata directly after its key
+      // Base locale carries full metadata; other locales carry only the sourceHash of the EN string
+      // so external tools can detect staleness without the English file.
       if (locale == baseLocale) {
         final hasDescription = (e.meta.description ?? '').isNotEmpty;
         final hasPlaceholders = e.meta.placeholders.isNotEmpty;
-        final hasSourceHash = (e.meta.sourceHash ?? '').isNotEmpty;
-        if (hasDescription || hasPlaceholders || hasSourceHash) {
+        final sourceText = e.values[baseLocale] ?? '';
+        final currentHash = sourceText.isNotEmpty ? HashUtils.computeSourceHash(sourceText) : null;
+        if (hasDescription || hasPlaceholders || currentHash != null) {
           map['@${e.key}'] = {
             if (hasDescription) 'description': e.meta.description,
             if (hasPlaceholders) 'placeholders': {for (final p in e.meta.placeholders) p: <String, dynamic>{}},
-            if (hasSourceHash) 'sourceHash': e.meta.sourceHash,
+            if (currentHash != null) 'sourceHash': currentHash,
           };
+        }
+      } else {
+        // Non-base locale: write sourceHash for the EN source string at save time.
+        // This allows detecting stale translations even without the English file.
+        final sourceText = e.values[baseLocale] ?? '';
+        if (sourceText.isNotEmpty) {
+          map['@${e.key}'] = {'sourceHash': HashUtils.computeSourceHash(sourceText)};
         }
       }
     }

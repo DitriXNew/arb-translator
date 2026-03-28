@@ -47,9 +47,11 @@ Every edit or AI result re‑checks placeholder sets vs English. Any difference 
 
 ## Source Change Tracking
 * Automatically detects when source (English) text has changed using SHA-256 hashing
+* Every ARB file (including translated locales) stores `"sourceHash"` in the `@key` annotation — the SHA-256 of the English string **at save time**, so staleness can be detected without the English file
 * Shows ⚠️ icon next to keys with modified source text
 * Displays count of changed source keys in stats panel
-* "Commit Source Hashes" button to update all hashes after reviewing changes
+* Bulk translate **"Only Empty"** automatically re-translates keys with a changed source too — no need to re-translate by hand after editing English strings
+* "Commit Source Hashes" button to mark all hashes as confirmed after reviewing changes
 * Helps identify which translations need updating after source text modifications
 
 ## Cleanup Tools
