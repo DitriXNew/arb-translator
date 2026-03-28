@@ -5,6 +5,8 @@ class LoadArbFolder {
   LoadArbFolder(this.repo);
   final TranslationRepository repo;
 
-  Future<(String baseLocale, List<String> locales, List<TranslationEntry> entries)> call(String path) async =>
+  Future<(String baseLocale, List<String> locales, List<TranslationEntry> entries, String fileNamePrefix)> call(
+    String path,
+  ) async =>
       repo.loadFolder(path);
 }

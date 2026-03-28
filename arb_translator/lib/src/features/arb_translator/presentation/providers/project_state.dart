@@ -8,6 +8,7 @@ abstract class ProjectState with _$ProjectState {
   const factory ProjectState({
     String? folderPath,
     @Default('en') String baseLocale,
+    @Default('app_') String fileNamePrefix,
     @Default(<String>[]) List<String> locales,
     @Default(<TranslationEntry>[]) List<TranslationEntry> entries,
     @Default(<String>{}) Set<String> baseLocaleKeys,

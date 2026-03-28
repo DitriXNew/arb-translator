@@ -40,7 +40,7 @@ class ProjectController extends _$ProjectController {
     try {
       final repo = TranslationRepositoryImpl(ArbFileDataSource());
       final loader = LoadArbFolder(repo);
-      final (baseLocale, locales, entries) = await loader(path);
+      final (baseLocale, locales, entries, fileNamePrefix) = await loader(path);
       logInfo(
         'Loaded folder successfully: $path, base: $baseLocale, locales: ${locales.length}, entries: ${entries.length}',
       );
@@ -53,7 +53,7 @@ class ProjectController extends _$ProjectController {
       final Set<String> sourceChangedKeys = <String>{};
       try {
         final normalizedPath = path.endsWith(Platform.pathSeparator) ? path.substring(0, path.length - 1) : path;
-        final baseFile = File('$normalizedPath${Platform.pathSeparator}app_$baseLocale.arb');
+        final baseFile = File('$normalizedPath${Platform.pathSeparator}$fileNamePrefix$baseLocale.arb');
         // ignore: avoid_slow_async_io (single existence check during initial load)
         if (await baseFile.exists()) {
           // ignore: avoid_slow_async_io (single read on load acceptable)
@@ -78,6 +78,7 @@ class ProjectController extends _$ProjectController {
       state = state.copyWith(
         folderPath: path,
         baseLocale: baseLocale,
+        fileNamePrefix: fileNamePrefix,
         locales: locales,
         entries: entries,
         baseLocaleKeys: baseKeys,
@@ -332,11 +333,12 @@ class ProjectController extends _$ProjectController {
     try {
       final ds = ArbFileDataSource();
       final base = state.baseLocale;
+      final prefix = state.fileNamePrefix;
 
       for (final locale in state.locales) {
         logDebug('Saving locale file: $locale');
         final data = ds.serializeLocale(entries: state.entries, locale: locale, baseLocale: base);
-        await ds.writeArb(folderPath: state.folderPath!, locale: locale, data: data);
+        await ds.writeArb(folderPath: state.folderPath!, locale: locale, fileNamePrefix: prefix, data: data);
       }
 
       state = state.copyWith(

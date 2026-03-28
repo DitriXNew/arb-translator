@@ -42,9 +42,10 @@ class ArbFileDataSource {
   Future<void> writeArb({
     required String folderPath,
     required String locale,
+    required String fileNamePrefix,
     required Map<String, dynamic> data,
   }) async {
-    final file = File(_localeFilePath(folderPath, locale));
+    final file = File(_localeFilePath(folderPath, locale, fileNamePrefix));
     logDebug('Writing ARB file: ${file.path}, keys: ${data.keys.length}');
 
     const encoder = JsonEncoder.withIndent('  ');
@@ -53,7 +54,7 @@ class ArbFileDataSource {
     logInfo('Successfully wrote ARB file: ${file.path}');
   }
 
-  String _localeFilePath(String folder, String locale) => '$folder/app_$locale.arb';
+  String _localeFilePath(String folder, String locale, String fileNamePrefix) => '$folder/${fileNamePrefix}$locale.arb';
 
   /// Merge ARB maps into TranslationEntry list.
   (List<String> locales, List<TranslationEntry> entries) merge(Map<String, Map<String, dynamic>> perLocale) {
@@ -115,8 +116,12 @@ class ArbFileDataSource {
     final map = <String, dynamic>{'@@locale': locale};
     final sorted = [...entries]..sort((a, b) => a.key.compareTo(b.key));
     for (final e in sorted) {
+      final value = e.values[locale] ?? '';
+      // For non-base locales: skip keys with no translation (omit empty strings).
+      // For the base locale: always write the key (empty base values are valid).
+      if (locale != baseLocale && value.isEmpty) continue;
       // Add the translation value first
-      map[e.key] = e.values[locale] ?? '';
+      map[e.key] = value;
       // Only base locale file carries metadata directly after its key
       if (locale == baseLocale) {
         final hasDescription = (e.meta.description ?? '').isNotEmpty;
