@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProjectState {
 
- String? get folderPath; String get baseLocale; String get fileNamePrefix; List<String> get locales; List<TranslationEntry> get entries; Set<String> get baseLocaleKeys; Set<(String key, String locale)> get dirtyCells; Set<String> get dirtyLocales; Set<(String, String)> get errorCells; Set<String> get sourceChangedKeys; bool get hasUnsavedChanges; bool get showOnlyErrors; bool get showOnlyUntranslated; String get searchQuery; bool get isLoading; bool get isSaving; (String key, String locale)? get lastEditedCell; DateTime? get lastSavedAt;
+ String? get folderPath; String get baseLocale; String get fileNamePrefix; List<String> get locales; List<TranslationEntry> get entries; Set<String> get baseLocaleKeys; Set<(String key, String locale)> get dirtyCells; Set<String> get dirtyLocales; Set<(String, String)> get errorCells; Set<String> get sourceChangedKeys; bool get hasUnsavedChanges; bool get showOnlyErrors; bool get showNeedsTranslation; String get searchQuery; bool get isLoading; bool get isSaving; (String key, String locale)? get lastEditedCell; DateTime? get lastSavedAt;
 /// Create a copy of ProjectState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ProjectStateCopyWith<ProjectState> get copyWith => _$ProjectStateCopyWithImpl<P
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProjectState&&(identical(other.folderPath, folderPath) || other.folderPath == folderPath)&&(identical(other.baseLocale, baseLocale) || other.baseLocale == baseLocale)&&(identical(other.fileNamePrefix, fileNamePrefix) || other.fileNamePrefix == fileNamePrefix)&&const DeepCollectionEquality().equals(other.locales, locales)&&const DeepCollectionEquality().equals(other.entries, entries)&&const DeepCollectionEquality().equals(other.baseLocaleKeys, baseLocaleKeys)&&const DeepCollectionEquality().equals(other.dirtyCells, dirtyCells)&&const DeepCollectionEquality().equals(other.dirtyLocales, dirtyLocales)&&const DeepCollectionEquality().equals(other.errorCells, errorCells)&&const DeepCollectionEquality().equals(other.sourceChangedKeys, sourceChangedKeys)&&(identical(other.hasUnsavedChanges, hasUnsavedChanges) || other.hasUnsavedChanges == hasUnsavedChanges)&&(identical(other.showOnlyErrors, showOnlyErrors) || other.showOnlyErrors == showOnlyErrors)&&(identical(other.showOnlyUntranslated, showOnlyUntranslated) || other.showOnlyUntranslated == showOnlyUntranslated)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.lastEditedCell, lastEditedCell) || other.lastEditedCell == lastEditedCell)&&(identical(other.lastSavedAt, lastSavedAt) || other.lastSavedAt == lastSavedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProjectState&&(identical(other.folderPath, folderPath) || other.folderPath == folderPath)&&(identical(other.baseLocale, baseLocale) || other.baseLocale == baseLocale)&&(identical(other.fileNamePrefix, fileNamePrefix) || other.fileNamePrefix == fileNamePrefix)&&const DeepCollectionEquality().equals(other.locales, locales)&&const DeepCollectionEquality().equals(other.entries, entries)&&const DeepCollectionEquality().equals(other.baseLocaleKeys, baseLocaleKeys)&&const DeepCollectionEquality().equals(other.dirtyCells, dirtyCells)&&const DeepCollectionEquality().equals(other.dirtyLocales, dirtyLocales)&&const DeepCollectionEquality().equals(other.errorCells, errorCells)&&const DeepCollectionEquality().equals(other.sourceChangedKeys, sourceChangedKeys)&&(identical(other.hasUnsavedChanges, hasUnsavedChanges) || other.hasUnsavedChanges == hasUnsavedChanges)&&(identical(other.showOnlyErrors, showOnlyErrors) || other.showOnlyErrors == showOnlyErrors)&&(identical(other.showNeedsTranslation, showNeedsTranslation) || other.showNeedsTranslation == showNeedsTranslation)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.lastEditedCell, lastEditedCell) || other.lastEditedCell == lastEditedCell)&&(identical(other.lastSavedAt, lastSavedAt) || other.lastSavedAt == lastSavedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,folderPath,baseLocale,fileNamePrefix,const DeepCollectionEquality().hash(locales),const DeepCollectionEquality().hash(entries),const DeepCollectionEquality().hash(baseLocaleKeys),const DeepCollectionEquality().hash(dirtyCells),const DeepCollectionEquality().hash(dirtyLocales),const DeepCollectionEquality().hash(errorCells),const DeepCollectionEquality().hash(sourceChangedKeys),hasUnsavedChanges,showOnlyErrors,showOnlyUntranslated,searchQuery,isLoading,isSaving,lastEditedCell,lastSavedAt);
+int get hashCode => Object.hash(runtimeType,folderPath,baseLocale,fileNamePrefix,const DeepCollectionEquality().hash(locales),const DeepCollectionEquality().hash(entries),const DeepCollectionEquality().hash(baseLocaleKeys),const DeepCollectionEquality().hash(dirtyCells),const DeepCollectionEquality().hash(dirtyLocales),const DeepCollectionEquality().hash(errorCells),const DeepCollectionEquality().hash(sourceChangedKeys),hasUnsavedChanges,showOnlyErrors,showNeedsTranslation,searchQuery,isLoading,isSaving,lastEditedCell,lastSavedAt);
 
 @override
 String toString() {
-  return 'ProjectState(folderPath: $folderPath, baseLocale: $baseLocale, fileNamePrefix: $fileNamePrefix, locales: $locales, entries: $entries, baseLocaleKeys: $baseLocaleKeys, dirtyCells: $dirtyCells, dirtyLocales: $dirtyLocales, errorCells: $errorCells, sourceChangedKeys: $sourceChangedKeys, hasUnsavedChanges: $hasUnsavedChanges, showOnlyErrors: $showOnlyErrors, showOnlyUntranslated: $showOnlyUntranslated, searchQuery: $searchQuery, isLoading: $isLoading, isSaving: $isSaving, lastEditedCell: $lastEditedCell, lastSavedAt: $lastSavedAt)';
+  return 'ProjectState(folderPath: $folderPath, baseLocale: $baseLocale, fileNamePrefix: $fileNamePrefix, locales: $locales, entries: $entries, baseLocaleKeys: $baseLocaleKeys, dirtyCells: $dirtyCells, dirtyLocales: $dirtyLocales, errorCells: $errorCells, sourceChangedKeys: $sourceChangedKeys, hasUnsavedChanges: $hasUnsavedChanges, showOnlyErrors: $showOnlyErrors, showNeedsTranslation: $showNeedsTranslation, searchQuery: $searchQuery, isLoading: $isLoading, isSaving: $isSaving, lastEditedCell: $lastEditedCell, lastSavedAt: $lastSavedAt)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $ProjectStateCopyWith<$Res>  {
   factory $ProjectStateCopyWith(ProjectState value, $Res Function(ProjectState) _then) = _$ProjectStateCopyWithImpl;
 @useResult
 $Res call({
- String? folderPath, String baseLocale, String fileNamePrefix, List<String> locales, List<TranslationEntry> entries, Set<String> baseLocaleKeys, Set<(String key, String locale)> dirtyCells, Set<String> dirtyLocales, Set<(String, String)> errorCells, Set<String> sourceChangedKeys, bool hasUnsavedChanges, bool showOnlyErrors, bool showOnlyUntranslated, String searchQuery, bool isLoading, bool isSaving, (String key, String locale)? lastEditedCell, DateTime? lastSavedAt
+ String? folderPath, String baseLocale, String fileNamePrefix, List<String> locales, List<TranslationEntry> entries, Set<String> baseLocaleKeys, Set<(String key, String locale)> dirtyCells, Set<String> dirtyLocales, Set<(String, String)> errorCells, Set<String> sourceChangedKeys, bool hasUnsavedChanges, bool showOnlyErrors, bool showNeedsTranslation, String searchQuery, bool isLoading, bool isSaving, (String key, String locale)? lastEditedCell, DateTime? lastSavedAt
 });
 
 
@@ -62,7 +62,7 @@ class _$ProjectStateCopyWithImpl<$Res>
 
 /// Create a copy of ProjectState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? folderPath = freezed,Object? baseLocale = null,Object? fileNamePrefix = null,Object? locales = null,Object? entries = null,Object? baseLocaleKeys = null,Object? dirtyCells = null,Object? dirtyLocales = null,Object? errorCells = null,Object? sourceChangedKeys = null,Object? hasUnsavedChanges = null,Object? showOnlyErrors = null,Object? showOnlyUntranslated = null,Object? searchQuery = null,Object? isLoading = null,Object? isSaving = null,Object? lastEditedCell = freezed,Object? lastSavedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? folderPath = freezed,Object? baseLocale = null,Object? fileNamePrefix = null,Object? locales = null,Object? entries = null,Object? baseLocaleKeys = null,Object? dirtyCells = null,Object? dirtyLocales = null,Object? errorCells = null,Object? sourceChangedKeys = null,Object? hasUnsavedChanges = null,Object? showOnlyErrors = null,Object? showNeedsTranslation = null,Object? searchQuery = null,Object? isLoading = null,Object? isSaving = null,Object? lastEditedCell = freezed,Object? lastSavedAt = freezed,}) {
   return _then(_self.copyWith(
 folderPath: freezed == folderPath ? _self.folderPath : folderPath // ignore: cast_nullable_to_non_nullable
 as String?,baseLocale: null == baseLocale ? _self.baseLocale : baseLocale // ignore: cast_nullable_to_non_nullable
@@ -76,7 +76,7 @@ as Set<String>,errorCells: null == errorCells ? _self.errorCells : errorCells //
 as Set<(String, String)>,sourceChangedKeys: null == sourceChangedKeys ? _self.sourceChangedKeys : sourceChangedKeys // ignore: cast_nullable_to_non_nullable
 as Set<String>,hasUnsavedChanges: null == hasUnsavedChanges ? _self.hasUnsavedChanges : hasUnsavedChanges // ignore: cast_nullable_to_non_nullable
 as bool,showOnlyErrors: null == showOnlyErrors ? _self.showOnlyErrors : showOnlyErrors // ignore: cast_nullable_to_non_nullable
-as bool,showOnlyUntranslated: null == showOnlyUntranslated ? _self.showOnlyUntranslated : showOnlyUntranslated // ignore: cast_nullable_to_non_nullable
+as bool,showNeedsTranslation: null == showNeedsTranslation ? _self.showNeedsTranslation : showNeedsTranslation // ignore: cast_nullable_to_non_nullable
 as bool,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
 as String,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
@@ -167,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? folderPath,  String baseLocale,  String fileNamePrefix,  List<String> locales,  List<TranslationEntry> entries,  Set<String> baseLocaleKeys,  Set<(String key, String locale)> dirtyCells,  Set<String> dirtyLocales,  Set<(String, String)> errorCells,  Set<String> sourceChangedKeys,  bool hasUnsavedChanges,  bool showOnlyErrors,  bool showOnlyUntranslated,  String searchQuery,  bool isLoading,  bool isSaving,  (String key, String locale)? lastEditedCell,  DateTime? lastSavedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? folderPath,  String baseLocale,  String fileNamePrefix,  List<String> locales,  List<TranslationEntry> entries,  Set<String> baseLocaleKeys,  Set<(String key, String locale)> dirtyCells,  Set<String> dirtyLocales,  Set<(String, String)> errorCells,  Set<String> sourceChangedKeys,  bool hasUnsavedChanges,  bool showOnlyErrors,  bool showNeedsTranslation,  String searchQuery,  bool isLoading,  bool isSaving,  (String key, String locale)? lastEditedCell,  DateTime? lastSavedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProjectState() when $default != null:
-return $default(_that.folderPath,_that.baseLocale,_that.fileNamePrefix,_that.locales,_that.entries,_that.baseLocaleKeys,_that.dirtyCells,_that.dirtyLocales,_that.errorCells,_that.sourceChangedKeys,_that.hasUnsavedChanges,_that.showOnlyErrors,_that.showOnlyUntranslated,_that.searchQuery,_that.isLoading,_that.isSaving,_that.lastEditedCell,_that.lastSavedAt);case _:
+return $default(_that.folderPath,_that.baseLocale,_that.fileNamePrefix,_that.locales,_that.entries,_that.baseLocaleKeys,_that.dirtyCells,_that.dirtyLocales,_that.errorCells,_that.sourceChangedKeys,_that.hasUnsavedChanges,_that.showOnlyErrors,_that.showNeedsTranslation,_that.searchQuery,_that.isLoading,_that.isSaving,_that.lastEditedCell,_that.lastSavedAt);case _:
   return orElse();
 
 }
@@ -188,10 +188,10 @@ return $default(_that.folderPath,_that.baseLocale,_that.fileNamePrefix,_that.loc
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? folderPath,  String baseLocale,  String fileNamePrefix,  List<String> locales,  List<TranslationEntry> entries,  Set<String> baseLocaleKeys,  Set<(String key, String locale)> dirtyCells,  Set<String> dirtyLocales,  Set<(String, String)> errorCells,  Set<String> sourceChangedKeys,  bool hasUnsavedChanges,  bool showOnlyErrors,  bool showOnlyUntranslated,  String searchQuery,  bool isLoading,  bool isSaving,  (String key, String locale)? lastEditedCell,  DateTime? lastSavedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? folderPath,  String baseLocale,  String fileNamePrefix,  List<String> locales,  List<TranslationEntry> entries,  Set<String> baseLocaleKeys,  Set<(String key, String locale)> dirtyCells,  Set<String> dirtyLocales,  Set<(String, String)> errorCells,  Set<String> sourceChangedKeys,  bool hasUnsavedChanges,  bool showOnlyErrors,  bool showNeedsTranslation,  String searchQuery,  bool isLoading,  bool isSaving,  (String key, String locale)? lastEditedCell,  DateTime? lastSavedAt)  $default,) {final _that = this;
 switch (_that) {
 case _ProjectState():
-return $default(_that.folderPath,_that.baseLocale,_that.fileNamePrefix,_that.locales,_that.entries,_that.baseLocaleKeys,_that.dirtyCells,_that.dirtyLocales,_that.errorCells,_that.sourceChangedKeys,_that.hasUnsavedChanges,_that.showOnlyErrors,_that.showOnlyUntranslated,_that.searchQuery,_that.isLoading,_that.isSaving,_that.lastEditedCell,_that.lastSavedAt);case _:
+return $default(_that.folderPath,_that.baseLocale,_that.fileNamePrefix,_that.locales,_that.entries,_that.baseLocaleKeys,_that.dirtyCells,_that.dirtyLocales,_that.errorCells,_that.sourceChangedKeys,_that.hasUnsavedChanges,_that.showOnlyErrors,_that.showNeedsTranslation,_that.searchQuery,_that.isLoading,_that.isSaving,_that.lastEditedCell,_that.lastSavedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -208,10 +208,10 @@ return $default(_that.folderPath,_that.baseLocale,_that.fileNamePrefix,_that.loc
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? folderPath,  String baseLocale,  String fileNamePrefix,  List<String> locales,  List<TranslationEntry> entries,  Set<String> baseLocaleKeys,  Set<(String key, String locale)> dirtyCells,  Set<String> dirtyLocales,  Set<(String, String)> errorCells,  Set<String> sourceChangedKeys,  bool hasUnsavedChanges,  bool showOnlyErrors,  bool showOnlyUntranslated,  String searchQuery,  bool isLoading,  bool isSaving,  (String key, String locale)? lastEditedCell,  DateTime? lastSavedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? folderPath,  String baseLocale,  String fileNamePrefix,  List<String> locales,  List<TranslationEntry> entries,  Set<String> baseLocaleKeys,  Set<(String key, String locale)> dirtyCells,  Set<String> dirtyLocales,  Set<(String, String)> errorCells,  Set<String> sourceChangedKeys,  bool hasUnsavedChanges,  bool showOnlyErrors,  bool showNeedsTranslation,  String searchQuery,  bool isLoading,  bool isSaving,  (String key, String locale)? lastEditedCell,  DateTime? lastSavedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _ProjectState() when $default != null:
-return $default(_that.folderPath,_that.baseLocale,_that.fileNamePrefix,_that.locales,_that.entries,_that.baseLocaleKeys,_that.dirtyCells,_that.dirtyLocales,_that.errorCells,_that.sourceChangedKeys,_that.hasUnsavedChanges,_that.showOnlyErrors,_that.showOnlyUntranslated,_that.searchQuery,_that.isLoading,_that.isSaving,_that.lastEditedCell,_that.lastSavedAt);case _:
+return $default(_that.folderPath,_that.baseLocale,_that.fileNamePrefix,_that.locales,_that.entries,_that.baseLocaleKeys,_that.dirtyCells,_that.dirtyLocales,_that.errorCells,_that.sourceChangedKeys,_that.hasUnsavedChanges,_that.showOnlyErrors,_that.showNeedsTranslation,_that.searchQuery,_that.isLoading,_that.isSaving,_that.lastEditedCell,_that.lastSavedAt);case _:
   return null;
 
 }
@@ -223,7 +223,7 @@ return $default(_that.folderPath,_that.baseLocale,_that.fileNamePrefix,_that.loc
 
 
 class _ProjectState implements ProjectState {
-  const _ProjectState({this.folderPath, this.baseLocale = 'en', this.fileNamePrefix = 'app_', final  List<String> locales = const <String>[], final  List<TranslationEntry> entries = const <TranslationEntry>[], final  Set<String> baseLocaleKeys = const <String>{}, final  Set<(String key, String locale)> dirtyCells = const <(String, String)>{}, final  Set<String> dirtyLocales = const <String>{}, final  Set<(String, String)> errorCells = const <(String, String)>{}, final  Set<String> sourceChangedKeys = const <String>{}, this.hasUnsavedChanges = false, this.showOnlyErrors = false, this.showOnlyUntranslated = false, this.searchQuery = '', this.isLoading = false, this.isSaving = false, this.lastEditedCell, this.lastSavedAt}): _locales = locales,_entries = entries,_baseLocaleKeys = baseLocaleKeys,_dirtyCells = dirtyCells,_dirtyLocales = dirtyLocales,_errorCells = errorCells,_sourceChangedKeys = sourceChangedKeys;
+  const _ProjectState({this.folderPath, this.baseLocale = 'en', this.fileNamePrefix = 'app_', final  List<String> locales = const <String>[], final  List<TranslationEntry> entries = const <TranslationEntry>[], final  Set<String> baseLocaleKeys = const <String>{}, final  Set<(String key, String locale)> dirtyCells = const <(String, String)>{}, final  Set<String> dirtyLocales = const <String>{}, final  Set<(String, String)> errorCells = const <(String, String)>{}, final  Set<String> sourceChangedKeys = const <String>{}, this.hasUnsavedChanges = false, this.showOnlyErrors = false, this.showNeedsTranslation = false, this.searchQuery = '', this.isLoading = false, this.isSaving = false, this.lastEditedCell, this.lastSavedAt}): _locales = locales,_entries = entries,_baseLocaleKeys = baseLocaleKeys,_dirtyCells = dirtyCells,_dirtyLocales = dirtyLocales,_errorCells = errorCells,_sourceChangedKeys = sourceChangedKeys;
   
 
 @override final  String? folderPath;
@@ -280,7 +280,7 @@ class _ProjectState implements ProjectState {
 
 @override@JsonKey() final  bool hasUnsavedChanges;
 @override@JsonKey() final  bool showOnlyErrors;
-@override@JsonKey() final  bool showOnlyUntranslated;
+@override@JsonKey() final  bool showNeedsTranslation;
 @override@JsonKey() final  String searchQuery;
 @override@JsonKey() final  bool isLoading;
 @override@JsonKey() final  bool isSaving;
@@ -297,16 +297,16 @@ _$ProjectStateCopyWith<_ProjectState> get copyWith => __$ProjectStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProjectState&&(identical(other.folderPath, folderPath) || other.folderPath == folderPath)&&(identical(other.baseLocale, baseLocale) || other.baseLocale == baseLocale)&&(identical(other.fileNamePrefix, fileNamePrefix) || other.fileNamePrefix == fileNamePrefix)&&const DeepCollectionEquality().equals(other._locales, _locales)&&const DeepCollectionEquality().equals(other._entries, _entries)&&const DeepCollectionEquality().equals(other._baseLocaleKeys, _baseLocaleKeys)&&const DeepCollectionEquality().equals(other._dirtyCells, _dirtyCells)&&const DeepCollectionEquality().equals(other._dirtyLocales, _dirtyLocales)&&const DeepCollectionEquality().equals(other._errorCells, _errorCells)&&const DeepCollectionEquality().equals(other._sourceChangedKeys, _sourceChangedKeys)&&(identical(other.hasUnsavedChanges, hasUnsavedChanges) || other.hasUnsavedChanges == hasUnsavedChanges)&&(identical(other.showOnlyErrors, showOnlyErrors) || other.showOnlyErrors == showOnlyErrors)&&(identical(other.showOnlyUntranslated, showOnlyUntranslated) || other.showOnlyUntranslated == showOnlyUntranslated)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.lastEditedCell, lastEditedCell) || other.lastEditedCell == lastEditedCell)&&(identical(other.lastSavedAt, lastSavedAt) || other.lastSavedAt == lastSavedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProjectState&&(identical(other.folderPath, folderPath) || other.folderPath == folderPath)&&(identical(other.baseLocale, baseLocale) || other.baseLocale == baseLocale)&&(identical(other.fileNamePrefix, fileNamePrefix) || other.fileNamePrefix == fileNamePrefix)&&const DeepCollectionEquality().equals(other._locales, _locales)&&const DeepCollectionEquality().equals(other._entries, _entries)&&const DeepCollectionEquality().equals(other._baseLocaleKeys, _baseLocaleKeys)&&const DeepCollectionEquality().equals(other._dirtyCells, _dirtyCells)&&const DeepCollectionEquality().equals(other._dirtyLocales, _dirtyLocales)&&const DeepCollectionEquality().equals(other._errorCells, _errorCells)&&const DeepCollectionEquality().equals(other._sourceChangedKeys, _sourceChangedKeys)&&(identical(other.hasUnsavedChanges, hasUnsavedChanges) || other.hasUnsavedChanges == hasUnsavedChanges)&&(identical(other.showOnlyErrors, showOnlyErrors) || other.showOnlyErrors == showOnlyErrors)&&(identical(other.showNeedsTranslation, showNeedsTranslation) || other.showNeedsTranslation == showNeedsTranslation)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.lastEditedCell, lastEditedCell) || other.lastEditedCell == lastEditedCell)&&(identical(other.lastSavedAt, lastSavedAt) || other.lastSavedAt == lastSavedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,folderPath,baseLocale,fileNamePrefix,const DeepCollectionEquality().hash(_locales),const DeepCollectionEquality().hash(_entries),const DeepCollectionEquality().hash(_baseLocaleKeys),const DeepCollectionEquality().hash(_dirtyCells),const DeepCollectionEquality().hash(_dirtyLocales),const DeepCollectionEquality().hash(_errorCells),const DeepCollectionEquality().hash(_sourceChangedKeys),hasUnsavedChanges,showOnlyErrors,showOnlyUntranslated,searchQuery,isLoading,isSaving,lastEditedCell,lastSavedAt);
+int get hashCode => Object.hash(runtimeType,folderPath,baseLocale,fileNamePrefix,const DeepCollectionEquality().hash(_locales),const DeepCollectionEquality().hash(_entries),const DeepCollectionEquality().hash(_baseLocaleKeys),const DeepCollectionEquality().hash(_dirtyCells),const DeepCollectionEquality().hash(_dirtyLocales),const DeepCollectionEquality().hash(_errorCells),const DeepCollectionEquality().hash(_sourceChangedKeys),hasUnsavedChanges,showOnlyErrors,showNeedsTranslation,searchQuery,isLoading,isSaving,lastEditedCell,lastSavedAt);
 
 @override
 String toString() {
-  return 'ProjectState(folderPath: $folderPath, baseLocale: $baseLocale, fileNamePrefix: $fileNamePrefix, locales: $locales, entries: $entries, baseLocaleKeys: $baseLocaleKeys, dirtyCells: $dirtyCells, dirtyLocales: $dirtyLocales, errorCells: $errorCells, sourceChangedKeys: $sourceChangedKeys, hasUnsavedChanges: $hasUnsavedChanges, showOnlyErrors: $showOnlyErrors, showOnlyUntranslated: $showOnlyUntranslated, searchQuery: $searchQuery, isLoading: $isLoading, isSaving: $isSaving, lastEditedCell: $lastEditedCell, lastSavedAt: $lastSavedAt)';
+  return 'ProjectState(folderPath: $folderPath, baseLocale: $baseLocale, fileNamePrefix: $fileNamePrefix, locales: $locales, entries: $entries, baseLocaleKeys: $baseLocaleKeys, dirtyCells: $dirtyCells, dirtyLocales: $dirtyLocales, errorCells: $errorCells, sourceChangedKeys: $sourceChangedKeys, hasUnsavedChanges: $hasUnsavedChanges, showOnlyErrors: $showOnlyErrors, showNeedsTranslation: $showNeedsTranslation, searchQuery: $searchQuery, isLoading: $isLoading, isSaving: $isSaving, lastEditedCell: $lastEditedCell, lastSavedAt: $lastSavedAt)';
 }
 
 
@@ -317,7 +317,7 @@ abstract mixin class _$ProjectStateCopyWith<$Res> implements $ProjectStateCopyWi
   factory _$ProjectStateCopyWith(_ProjectState value, $Res Function(_ProjectState) _then) = __$ProjectStateCopyWithImpl;
 @override @useResult
 $Res call({
- String? folderPath, String baseLocale, String fileNamePrefix, List<String> locales, List<TranslationEntry> entries, Set<String> baseLocaleKeys, Set<(String key, String locale)> dirtyCells, Set<String> dirtyLocales, Set<(String, String)> errorCells, Set<String> sourceChangedKeys, bool hasUnsavedChanges, bool showOnlyErrors, bool showOnlyUntranslated, String searchQuery, bool isLoading, bool isSaving, (String key, String locale)? lastEditedCell, DateTime? lastSavedAt
+ String? folderPath, String baseLocale, String fileNamePrefix, List<String> locales, List<TranslationEntry> entries, Set<String> baseLocaleKeys, Set<(String key, String locale)> dirtyCells, Set<String> dirtyLocales, Set<(String, String)> errorCells, Set<String> sourceChangedKeys, bool hasUnsavedChanges, bool showOnlyErrors, bool showNeedsTranslation, String searchQuery, bool isLoading, bool isSaving, (String key, String locale)? lastEditedCell, DateTime? lastSavedAt
 });
 
 
@@ -334,7 +334,7 @@ class __$ProjectStateCopyWithImpl<$Res>
 
 /// Create a copy of ProjectState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? folderPath = freezed,Object? baseLocale = null,Object? fileNamePrefix = null,Object? locales = null,Object? entries = null,Object? baseLocaleKeys = null,Object? dirtyCells = null,Object? dirtyLocales = null,Object? errorCells = null,Object? sourceChangedKeys = null,Object? hasUnsavedChanges = null,Object? showOnlyErrors = null,Object? showOnlyUntranslated = null,Object? searchQuery = null,Object? isLoading = null,Object? isSaving = null,Object? lastEditedCell = freezed,Object? lastSavedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? folderPath = freezed,Object? baseLocale = null,Object? fileNamePrefix = null,Object? locales = null,Object? entries = null,Object? baseLocaleKeys = null,Object? dirtyCells = null,Object? dirtyLocales = null,Object? errorCells = null,Object? sourceChangedKeys = null,Object? hasUnsavedChanges = null,Object? showOnlyErrors = null,Object? showNeedsTranslation = null,Object? searchQuery = null,Object? isLoading = null,Object? isSaving = null,Object? lastEditedCell = freezed,Object? lastSavedAt = freezed,}) {
   return _then(_ProjectState(
 folderPath: freezed == folderPath ? _self.folderPath : folderPath // ignore: cast_nullable_to_non_nullable
 as String?,baseLocale: null == baseLocale ? _self.baseLocale : baseLocale // ignore: cast_nullable_to_non_nullable
@@ -348,7 +348,7 @@ as Set<String>,errorCells: null == errorCells ? _self._errorCells : errorCells /
 as Set<(String, String)>,sourceChangedKeys: null == sourceChangedKeys ? _self._sourceChangedKeys : sourceChangedKeys // ignore: cast_nullable_to_non_nullable
 as Set<String>,hasUnsavedChanges: null == hasUnsavedChanges ? _self.hasUnsavedChanges : hasUnsavedChanges // ignore: cast_nullable_to_non_nullable
 as bool,showOnlyErrors: null == showOnlyErrors ? _self.showOnlyErrors : showOnlyErrors // ignore: cast_nullable_to_non_nullable
-as bool,showOnlyUntranslated: null == showOnlyUntranslated ? _self.showOnlyUntranslated : showOnlyUntranslated // ignore: cast_nullable_to_non_nullable
+as bool,showNeedsTranslation: null == showNeedsTranslation ? _self.showNeedsTranslation : showNeedsTranslation // ignore: cast_nullable_to_non_nullable
 as bool,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
 as String,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable

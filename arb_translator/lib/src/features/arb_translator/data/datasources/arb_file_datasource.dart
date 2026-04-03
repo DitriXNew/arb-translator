@@ -55,7 +55,7 @@ class ArbFileDataSource {
     logInfo('Successfully wrote ARB file: ${file.path}');
   }
 
-  String _localeFilePath(String folder, String locale, String fileNamePrefix) => '$folder/${fileNamePrefix}$locale.arb';
+  String _localeFilePath(String folder, String locale, String fileNamePrefix) => '$folder/$fileNamePrefix$locale.arb';
 
   /// Merge ARB maps into TranslationEntry list.
   (List<String> locales, List<TranslationEntry> entries) merge(Map<String, Map<String, dynamic>> perLocale) {

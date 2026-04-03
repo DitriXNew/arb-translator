@@ -29,7 +29,7 @@ Focused benefits:
 * Bulk translate column: All or Only Empty
 * Per‑cell translate button
 * Live search (by key)
-* Filters: Errors, Untranslated
+* Filters: Errors, Cells to translate (empty or source changed)
 * Dirty & error highlighting per cell & locale header
 * Undo / Redo stack cleared after successful save
 * Keyboard shortcuts: Ctrl+S / Z / Y, F2 (edit hook)
@@ -51,6 +51,7 @@ Every edit or AI result re‑checks placeholder sets vs English. Any difference 
 * Shows ⚠️ icon next to keys with modified source text
 * Displays count of changed source keys in stats panel
 * Bulk translate **"Only Empty"** automatically re-translates keys with a changed source too — no need to re-translate by hand after editing English strings
+* **"Cells to translate" filter** — shows all cells that need attention: empty translations and translations whose source text has changed (detected via SHA-256), so you always know exactly what to work on next
 * "Commit Source Hashes" button to mark all hashes as confirmed after reviewing changes
 * Helps identify which translations need updating after source text modifications
 

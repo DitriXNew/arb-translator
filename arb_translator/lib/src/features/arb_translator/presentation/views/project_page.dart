@@ -211,7 +211,7 @@ class _StatusBar extends ConsumerWidget {
     }).length;
     final dirty = state.dirtyCells.length;
     final sourceChanged = state.sourceChangedKeys.length;
-    final hasFilters = state.searchQuery.isNotEmpty || state.showOnlyErrors || state.showOnlyUntranslated;
+    final hasFilters = state.searchQuery.isNotEmpty || state.showOnlyErrors || state.showNeedsTranslation;
     return Container(
       height: 26,
       decoration: const BoxDecoration(

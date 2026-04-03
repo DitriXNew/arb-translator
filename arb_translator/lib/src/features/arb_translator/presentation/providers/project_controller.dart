@@ -135,6 +135,12 @@ class ProjectController extends _$ProjectController {
     final newDirtyCells = Set<(String, String)>.from(state.dirtyCells)..add((key, locale));
     final newDirtyLocales = Set<String>.from(state.dirtyLocales)..add(locale);
 
+    // If we just translated/edited a non-base locale cell, the stale-source
+    // flag for this key is no longer relevant — clear it.
+    final newSourceChangedKeys = (locale != state.baseLocale && state.sourceChangedKeys.contains(key))
+        ? (Set<String>.from(state.sourceChangedKeys)..remove(key))
+        : state.sourceChangedKeys;
+
     final prevState = state;
 
     // Optimize: avoid recreating state if hasUnsavedChanges is already true
@@ -147,6 +153,7 @@ class ProjectController extends _$ProjectController {
       dirtyLocales: newDirtyLocales,
       hasUnsavedChanges: needsUnsavedFlag || state.hasUnsavedChanges,
       errorCells: newErrorCells,
+      sourceChangedKeys: newSourceChangedKeys,
       lastEditedCell: (key, locale),
     );
     state = nextState;
@@ -429,8 +436,8 @@ class ProjectController extends _$ProjectController {
     state = state.copyWith(showOnlyErrors: !state.showOnlyErrors);
   }
 
-  void toggleFilterUntranslated() {
-    state = state.copyWith(showOnlyUntranslated: !state.showOnlyUntranslated);
+  void toggleFilterNeedsTranslation() {
+    state = state.copyWith(showNeedsTranslation: !state.showNeedsTranslation);
   }
 
   void updateSearchQuery(String query) {

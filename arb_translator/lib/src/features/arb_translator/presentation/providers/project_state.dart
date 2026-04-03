@@ -18,7 +18,7 @@ abstract class ProjectState with _$ProjectState {
     @Default(<String>{}) Set<String> sourceChangedKeys,
     @Default(false) bool hasUnsavedChanges,
     @Default(false) bool showOnlyErrors,
-    @Default(false) bool showOnlyUntranslated,
+    @Default(false) bool showNeedsTranslation,
     @Default('') String searchQuery,
     @Default(false) bool isLoading,
     @Default(false) bool isSaving,

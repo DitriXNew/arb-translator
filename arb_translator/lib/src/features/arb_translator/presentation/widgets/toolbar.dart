@@ -58,9 +58,9 @@ class ProjectToolbar extends ConsumerWidget {
           ),
           const SizedBox(width: AppSpacing.xs),
           IconButton(
-            tooltip: state.showOnlyUntranslated ? 'Show all rows' : 'Filter: only untranslated cells',
-            onPressed: hasFolder ? controller.toggleFilterUntranslated : null,
-            icon: Icon(Icons.translate, size: 18, color: state.showOnlyUntranslated ? accent : AppColors.textPrimary),
+            tooltip: state.showNeedsTranslation ? 'Show all rows' : 'Cells to translate: empty or source changed',
+            onPressed: hasFolder ? controller.toggleFilterNeedsTranslation : null,
+            icon: Icon(Icons.translate, size: 18, color: state.showNeedsTranslation ? accent : AppColors.textPrimary),
           ),
           const SizedBox(width: AppSpacing.xs),
           Tooltip(

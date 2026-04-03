@@ -59,12 +59,10 @@ linter:
     - use_key_in_widget_constructors
     - always_use_package_imports
     - always_put_required_named_parameters_first
-    - always_require_non_null_named_parameters
     - avoid_annotating_with_dynamic
     - avoid_equals_and_hash_code_on_mutable_classes
     - avoid_function_literals_in_foreach_calls
     - avoid_implementing_value_types
-    - invariant_booleans
     - no_leading_underscores_for_local_identifiers
     - prefer_asserts_in_initializer_lists
     - prefer_expression_function_bodies
@@ -75,7 +73,6 @@ linter:
     - prefer_final_fields
     - avoid_redundant_argument_values
     - sort_child_properties_last
-    - avoid_returning_null_for_future
     - curly_braces_in_flow_control_structures
     - prefer_is_empty
     - library_prefixes
@@ -162,7 +159,6 @@ linter:
     - avoid_private_typedef_functions
     - avoid_renaming_method_parameters
     - avoid_return_types_on_setters
-    - avoid_returning_null
     - avoid_returning_null_for_void
     - avoid_setters_without_getters
     - avoid_single_cascade_in_expression_statements

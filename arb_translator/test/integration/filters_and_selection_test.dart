@@ -43,11 +43,11 @@ void main() {
       controller.state = ProjectState(folderPath: tempDir.path, baseLocale: base, locales: locales, entries: entries);
       // Initially: 2 entries greet & bye
       expect(container.read(filteredEntriesProvider).length, 2);
-      // Untranslated filter: es 'bye' empty -> expect only bye
-      controller.toggleFilterUntranslated();
+      // Needs-translation filter: es 'bye' empty -> expect only bye
+      controller.toggleFilterNeedsTranslation();
       expect(container.read(filteredEntriesProvider).map((e) => e.key).toList(), ['bye']);
-      // Clear untranslated filter
-      controller.toggleFilterUntranslated();
+      // Clear needs-translation filter
+      controller.toggleFilterNeedsTranslation();
       // Introduce placeholder error: remove placeholder in es greet
       controller.updateCell(key: 'greet', locale: 'es', text: 'Hola');
       expect(controller.state.errorCells.contains(('greet', 'es')), isTrue);

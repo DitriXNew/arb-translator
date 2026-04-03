@@ -86,10 +86,10 @@ void main() {
       // Apply errors filter -> key appears
       controller.toggleFilterErrors();
       expect(container.read(filteredEntriesProvider).map((e) => e.key), ['combo']);
-      // Apply untranslated filter as well (fr empty) -> still present
-      controller.toggleFilterUntranslated();
+      // Apply needs-translation filter as well (fr empty) -> still present
+      controller.toggleFilterNeedsTranslation();
       expect(container.read(filteredEntriesProvider).map((e) => e.key), ['combo']);
-      // Removing errors filter leaves untranslated still -> still present
+      // Removing errors filter leaves needs-translation still -> still present
       controller.toggleFilterErrors();
       expect(container.read(filteredEntriesProvider).map((e) => e.key), ['combo']);
     });
