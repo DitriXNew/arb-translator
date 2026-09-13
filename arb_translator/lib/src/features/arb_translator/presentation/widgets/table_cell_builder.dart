@@ -155,7 +155,7 @@ class TableCellBuilder {
       case 'placeholders':
         return TranslationCell(
           width: colWidths[colId]! - 1,
-          text: e.meta.placeholders.join(', '),
+          text: e.meta.placeholders.keys.join(', '),
           centerVertically: true,
           background: bg,
           onSecondaryTapDown: (d) => onShowCellMenu(position: d.globalPosition, entry: e, colId: colId),

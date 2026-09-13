@@ -39,7 +39,7 @@ void main() {
       addTearDown(sub.close);
       final repo = TranslationRepositoryImpl(ArbFileDataSource());
       final loader = LoadArbFolder(repo);
-      final (base, locales, entries) = await loader(tempDir.path);
+      final (base, locales, entries, _) = await loader(tempDir.path);
       controller.state = ProjectState(folderPath: tempDir.path, baseLocale: base, locales: locales, entries: entries);
       // Initially: 2 entries greet & bye
       expect(container.read(filteredEntriesProvider).length, 2);

@@ -10,16 +10,16 @@ _EntryMetadata _$EntryMetadataFromJson(Map<String, dynamic> json) =>
     _EntryMetadata(
       description: json['description'] as String?,
       placeholders:
-          (json['placeholders'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toSet() ??
-          const <String>{},
+          (json['placeholders'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, e as Map<String, dynamic>),
+          ) ??
+          const <String, Map<String, dynamic>>{},
       sourceHash: json['sourceHash'] as String?,
     );
 
 Map<String, dynamic> _$EntryMetadataToJson(_EntryMetadata instance) =>
     <String, dynamic>{
       'description': instance.description,
-      'placeholders': instance.placeholders.toList(),
+      'placeholders': instance.placeholders,
       'sourceHash': instance.sourceHash,
     };

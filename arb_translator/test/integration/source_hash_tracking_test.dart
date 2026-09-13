@@ -54,7 +54,7 @@ void main() {
       final loader = LoadArbFolder(repo);
 
       // Load project
-      final (baseLocale, locales, entries) = await loader(tempDir.path);
+      final (baseLocale, locales, entries, _) = await loader(tempDir.path);
       expect(baseLocale, 'en');
       expect(locales, ['en', 'de']);
       expect(entries.length, 2);

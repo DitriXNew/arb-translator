@@ -82,7 +82,17 @@ class ArbFileDataSource {
       EntryMetadata meta;
       if (metaMap != null) {
         final placeholdersRaw = metaMap['placeholders'];
-        final placeholders = placeholdersRaw is Map ? Set<String>.from(placeholdersRaw.keys) : const <String>{};
+        // Keep every placeholder's attribute map verbatim. Reading just the
+        // names here is what silently stripped `type` / `format` / `example` /
+        // `optionalParameters` out of each template this tool round-tripped.
+        final placeholders = placeholdersRaw is Map
+            ? <String, Map<String, dynamic>>{
+                for (final placeholder in placeholdersRaw.entries)
+                  '${placeholder.key}': placeholder.value is Map
+                      ? Map<String, dynamic>.from(placeholder.value as Map)
+                      : <String, dynamic>{},
+              }
+            : const <String, Map<String, dynamic>>{};
         final storedHash = metaMap['sourceHash'] as String?;
         meta = EntryMetadata(
           description: metaMap['description'] as String?,
@@ -133,7 +143,15 @@ class ArbFileDataSource {
         if (hasDescription || hasPlaceholders || currentHash != null) {
           map['@${e.key}'] = {
             if (hasDescription) 'description': e.meta.description,
-            if (hasPlaceholders) 'placeholders': {for (final p in e.meta.placeholders) p: <String, dynamic>{}},
+            // Write each placeholder's attributes back verbatim. Emitting `{}`
+            // here is the other half of the strip: it turns a declared
+            // `{"type": "int"}` into an untyped placeholder, and gen-l10n then
+            // generates `Object` instead of `int` across every locale.
+            if (hasPlaceholders)
+              'placeholders': {
+                for (final placeholder in e.meta.placeholders.entries)
+                  placeholder.key: Map<String, dynamic>.from(placeholder.value),
+              },
             if (currentHash != null) 'sourceHash': currentHash,
           };
         }

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$EntryMetadata {
 
- String? get description; Set<String> get placeholders; String? get sourceHash;
+ String? get description; Map<String, Map<String, dynamic>> get placeholders; String? get sourceHash;
 /// Create a copy of EntryMetadata
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $EntryMetadataCopyWith<$Res>  {
   factory $EntryMetadataCopyWith(EntryMetadata value, $Res Function(EntryMetadata) _then) = _$EntryMetadataCopyWithImpl;
 @useResult
 $Res call({
- String? description, Set<String> placeholders, String? sourceHash
+ String? description, Map<String, Map<String, dynamic>> placeholders, String? sourceHash
 });
 
 
@@ -69,7 +69,7 @@ class _$EntryMetadataCopyWithImpl<$Res>
   return _then(_self.copyWith(
 description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,placeholders: null == placeholders ? _self.placeholders : placeholders // ignore: cast_nullable_to_non_nullable
-as Set<String>,sourceHash: freezed == sourceHash ? _self.sourceHash : sourceHash // ignore: cast_nullable_to_non_nullable
+as Map<String, Map<String, dynamic>>,sourceHash: freezed == sourceHash ? _self.sourceHash : sourceHash // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -155,7 +155,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? description,  Set<String> placeholders,  String? sourceHash)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? description,  Map<String, Map<String, dynamic>> placeholders,  String? sourceHash)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _EntryMetadata() when $default != null:
 return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
@@ -176,7 +176,7 @@ return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? description,  Set<String> placeholders,  String? sourceHash)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? description,  Map<String, Map<String, dynamic>> placeholders,  String? sourceHash)  $default,) {final _that = this;
 switch (_that) {
 case _EntryMetadata():
 return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
@@ -196,7 +196,7 @@ return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? description,  Set<String> placeholders,  String? sourceHash)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? description,  Map<String, Map<String, dynamic>> placeholders,  String? sourceHash)?  $default,) {final _that = this;
 switch (_that) {
 case _EntryMetadata() when $default != null:
 return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
@@ -211,15 +211,15 @@ return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
 @JsonSerializable()
 
 class _EntryMetadata implements EntryMetadata {
-  const _EntryMetadata({this.description, final  Set<String> placeholders = const <String>{}, this.sourceHash}): _placeholders = placeholders;
+  const _EntryMetadata({this.description, final  Map<String, Map<String, dynamic>> placeholders = const <String, Map<String, dynamic>>{}, this.sourceHash}): _placeholders = placeholders;
   factory _EntryMetadata.fromJson(Map<String, dynamic> json) => _$EntryMetadataFromJson(json);
 
 @override final  String? description;
- final  Set<String> _placeholders;
-@override@JsonKey() Set<String> get placeholders {
-  if (_placeholders is EqualUnmodifiableSetView) return _placeholders;
+ final  Map<String, Map<String, dynamic>> _placeholders;
+@override@JsonKey() Map<String, Map<String, dynamic>> get placeholders {
+  if (_placeholders is EqualUnmodifiableMapView) return _placeholders;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableSetView(_placeholders);
+  return EqualUnmodifiableMapView(_placeholders);
 }
 
 @override final  String? sourceHash;
@@ -257,7 +257,7 @@ abstract mixin class _$EntryMetadataCopyWith<$Res> implements $EntryMetadataCopy
   factory _$EntryMetadataCopyWith(_EntryMetadata value, $Res Function(_EntryMetadata) _then) = __$EntryMetadataCopyWithImpl;
 @override @useResult
 $Res call({
- String? description, Set<String> placeholders, String? sourceHash
+ String? description, Map<String, Map<String, dynamic>> placeholders, String? sourceHash
 });
 
 
@@ -278,7 +278,7 @@ class __$EntryMetadataCopyWithImpl<$Res>
   return _then(_EntryMetadata(
 description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,placeholders: null == placeholders ? _self._placeholders : placeholders // ignore: cast_nullable_to_non_nullable
-as Set<String>,sourceHash: freezed == sourceHash ? _self.sourceHash : sourceHash // ignore: cast_nullable_to_non_nullable
+as Map<String, Map<String, dynamic>>,sourceHash: freezed == sourceHash ? _self.sourceHash : sourceHash // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

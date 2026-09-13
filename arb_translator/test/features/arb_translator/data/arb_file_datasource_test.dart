@@ -27,7 +27,7 @@ void main() {
       expect(locales, ['en', 'de']);
       final hello = entries.firstWhere((e) => e.key == 'hello');
       expect(hello.meta.description, 'Greeting');
-      expect(hello.meta.placeholders, {'name'});
+      expect(hello.meta.placeholders, {'name': <String, dynamic>{}});
       final bye = entries.firstWhere((e) => e.key == 'bye');
       expect(bye.meta.description, isNull);
     });
@@ -36,7 +36,7 @@ void main() {
       final entries = [
         const TranslationEntry(
           key: 'hello',
-          meta: EntryMetadata(description: 'Greeting', placeholders: {'name'}),
+          meta: EntryMetadata(description: 'Greeting', placeholders: {'name': <String, dynamic>{}}),
           values: {'en': 'Hello {name}', 'de': 'Hallo {name}'},
         ),
         const TranslationEntry(key: 'bye', values: {'en': 'Bye', 'de': 'Tschüss'}),
@@ -44,12 +44,16 @@ void main() {
       final enMap = ds.serializeLocale(entries: entries, locale: 'en', baseLocale: 'en');
       final deMap = ds.serializeLocale(entries: entries, locale: 'de', baseLocale: 'en');
       expect(enMap.containsKey('@hello'), isTrue);
-      expect(deMap.containsKey('@hello'), isFalse);
+      // A non-base locale carries the source hash — that is what lets a stale
+      // translation be detected without the English file — but none of the
+      // descriptive metadata, which lives in the base locale alone.
+      expect((deMap['@hello'] as Map).keys, ['sourceHash']);
       expect(enMap.keys.first, '@@locale');
       // New ordering rule: keys alphabetically, each key followed immediately by its metadata (@key) in base locale.
       final keys = enMap.keys.toList();
-      // Expecting: @@locale, bye, hello, @hello
-      expect(keys, ['@@locale', 'bye', 'hello', '@hello']);
+      // `bye` carries no description or placeholders and still gets an @bye
+      // block, because every base-locale key is given a source hash.
+      expect(keys, ['@@locale', 'bye', '@bye', 'hello', '@hello']);
       // Assert @hello directly follows hello
       final helloIndex = keys.indexOf('hello');
       expect(keys[helloIndex + 1], '@hello');
@@ -65,14 +69,16 @@ void main() {
         locale: 'en',
         baseLocale: 'en',
       );
-      await ds.writeArb(folderPath: tempDir.path, locale: 'en', data: ordered);
+      await ds.writeArb(folderPath: tempDir.path, locale: 'en', fileNamePrefix: 'app_', data: ordered);
       final file = File(p.join(tempDir.path, 'app_en.arb'));
       final content = await file.readAsString();
       final decoded = json.decode(content) as Map<String, dynamic>;
       final keys = decoded.keys.toList();
       expect(keys.first, '@@locale');
-      // No metadata entries present here, so ordering after @@locale is just alphabetical keys.
-      expect(keys, ['@@locale', 'a', 'b']);
+      // Each base-locale key is followed immediately by its own @key block, which
+      // is emitted even with no description or placeholders because it carries
+      // the source hash.
+      expect(keys, ['@@locale', 'a', '@a', 'b', '@b']);
       await tempDir.delete(recursive: true);
     });
   });

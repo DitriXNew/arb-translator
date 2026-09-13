@@ -56,7 +56,7 @@ void main() {
 
       // Load data
       final loader = LoadArbFolder(repository);
-      final (baseLocale, locales, entries) = await loader(tempDir.path);
+      final (baseLocale, locales, entries, _) = await loader(tempDir.path);
       expect(entries, hasLength(1));
 
       final entry = entries.first;
@@ -107,7 +107,7 @@ void main() {
 
       // Load data
       final loader = LoadArbFolder(repository);
-      final (baseLocale, locales, entries) = await loader(tempDir.path);
+      final (baseLocale, locales, entries, _) = await loader(tempDir.path);
       expect(entries, hasLength(2));
 
       // Update hashes for all entries
@@ -123,11 +123,11 @@ void main() {
       // Save updated data
       for (final locale in locales) {
         final data = dataSource.serializeLocale(entries: updatedEntries, locale: locale, baseLocale: baseLocale);
-        await dataSource.writeArb(folderPath: tempDir.path, locale: locale, data: data);
+        await dataSource.writeArb(folderPath: tempDir.path, locale: locale, fileNamePrefix: 'app_', data: data);
       }
 
       // Reload and verify hashes are saved
-      final (_, _, reloadedEntries) = await loader(tempDir.path);
+      final (_, _, reloadedEntries, _) = await loader(tempDir.path);
       expect(reloadedEntries, hasLength(2));
 
       for (final entry in reloadedEntries) {
@@ -158,7 +158,7 @@ void main() {
 
       // Load data
       final loader = LoadArbFolder(repository);
-      final (baseLocale, locales, entries) = await loader(tempDir.path);
+      final (baseLocale, locales, entries, _) = await loader(tempDir.path);
       expect(entries, hasLength(1));
 
       final entry = entries.first;
@@ -172,7 +172,7 @@ void main() {
       for (final locale in locales) {
         final entries = [updatedEntry];
         final data = dataSource.serializeLocale(entries: entries, locale: locale, baseLocale: baseLocale);
-        await dataSource.writeArb(folderPath: tempDir.path, locale: locale, data: data);
+        await dataSource.writeArb(folderPath: tempDir.path, locale: locale, fileNamePrefix: 'app_', data: data);
       }
 
       // Verify standard metadata is preserved

@@ -82,7 +82,7 @@ void main() {
       expect(byeEntry.values['fr'], 'Au revoir');
       // placeholder metadata preserved only in en
       final hello = state2.entries.firstWhere((e) => e.key == 'hello', orElse: () => throw 'hello missing');
-      expect(hello.meta.placeholders.contains('name'), isTrue);
+      expect(hello.meta.placeholders.containsKey('name'), isTrue);
     });
   });
 }

@@ -18,7 +18,7 @@ void main() {
         entries: [
           TranslationEntry(
             key: 'hello',
-            meta: EntryMetadata(placeholders: {'name'}),
+            meta: EntryMetadata(placeholders: {'name': <String, dynamic>{}}),
             values: {'en': 'Hello {name}', 'de': ''},
           ),
         ],
@@ -39,7 +39,7 @@ void main() {
         entries: [
           TranslationEntry(
             key: 'greet',
-            meta: EntryMetadata(placeholders: {'user'}),
+            meta: EntryMetadata(placeholders: {'user': <String, dynamic>{}}),
             values: {'en': 'Hi {user}', 'fr': ''},
           ),
         ],

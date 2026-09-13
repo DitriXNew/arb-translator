@@ -24,7 +24,7 @@ void main() {
       }
       final repo = TranslationRepositoryImpl(ds);
       final loader = LoadArbFolder(repo);
-      final (base, locales, entries) = await loader(dir.path);
+      final (base, locales, entries, _) = await loader(dir.path);
       final container = ProviderContainer();
       final controller = container.read(projectControllerProvider.notifier);
       final sub = container.listen(projectControllerProvider, (_, _) {});
@@ -51,7 +51,7 @@ void main() {
       // reload to verify
       final repo = TranslationRepositoryImpl(ds);
       final loader = LoadArbFolder(repo);
-      final (_, _, entries2) = await loader(controller.state.folderPath!);
+      final (_, _, entries2, _) = await loader(controller.state.folderPath!);
       expect(entries2.any((e) => e.key == 'greeting'), isTrue);
       expect(entries2.any((e) => e.key == 'hello'), isFalse);
       final enFile = await File(p.join(controller.state.folderPath!, 'app_en.arb')).readAsString();
@@ -68,7 +68,7 @@ void main() {
       await controller.saveAll();
       final repo = TranslationRepositoryImpl(ds);
       final loader = LoadArbFolder(repo);
-      final (_, _, entries2) = await loader(controller.state.folderPath!);
+      final (_, _, entries2, _) = await loader(controller.state.folderPath!);
       expect(entries2.any((e) => e.key == 'b'), isFalse);
       expect(entries2.any((e) => e.key == 'a'), isTrue);
     });

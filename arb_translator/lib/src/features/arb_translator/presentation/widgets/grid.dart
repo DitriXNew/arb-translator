@@ -12,6 +12,7 @@ import 'package:arb_translator/src/features/arb_translator/presentation/widgets/
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/table_menu_handler.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/table_sort_handler.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -139,7 +140,7 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
             cellText = entry.meta.description ?? '';
             break;
           case 'placeholders':
-            cellText = entry.meta.placeholders.join(', ');
+            cellText = entry.meta.placeholders.keys.join(', ');
             break;
           default:
             if (colId.startsWith('loc_')) {
@@ -225,13 +226,13 @@ class TranslationGridState extends ConsumerState<TranslationGrid> {
             controller: _verticalScroll,
             thumbVisibility: true,
             child: ListView.builder(
+              scrollCacheExtent: const ScrollCacheExtent.pixels(rowHeight * 20),
               controller: _verticalScroll,
               // Always attach a ScrollPosition so that Scrollbar assertion doesn't fire
               // in tests when there are 0 items (empty entries list scenario).
               physics: const AlwaysScrollableScrollPhysics(),
               itemExtent: rowHeight,
-              itemCount: displayEntries.length,
-              cacheExtent: rowHeight * 20, // Cache 20 rows ahead/behind for smoother scrolling
+              itemCount: displayEntries.length, // Cache 20 rows ahead/behind for smoother scrolling
               addAutomaticKeepAlives: false, // Don't keep alive off-screen items
               addRepaintBoundaries: false, // We manually add RepaintBoundary
               itemBuilder: (c, i) {
