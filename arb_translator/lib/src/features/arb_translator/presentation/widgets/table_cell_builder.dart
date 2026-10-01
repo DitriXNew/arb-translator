@@ -40,18 +40,16 @@ class TableCellBuilder {
     final controller = ref.read(projectControllerProvider.notifier);
     final dirty = state.dirtyCells.contains((e.key, colId.startsWith('loc_') ? colId.substring(4) : state.baseLocale));
     final isError = colId.startsWith('loc_') && state.errorCells.contains((e.key, colId.substring(4)));
-    final isSourceChanged = state.sourceChangedKeys.contains(e.key);
+    final locale = colId.startsWith('loc_') ? colId.substring(4) : null;
+    // Key column badge: some locale of this key is stale. Locale cell: this translation is stale.
+    final isSourceChanged = colId == 'key' && state.staleCells.any((c) => c.$1 == e.key);
     // Use passed value instead of ref.watch()
     final isTranslating = colId.startsWith('loc_') && activeTranslatingCell == (e.key, colId.substring(4));
     // Check if this cell is being edited
     final isEditing = editingCell == (e.key, colId);
 
     // Stale translation: source EN text changed after this locale was translated.
-    final isStaleTranslation =
-        isSourceChanged &&
-        colId.startsWith('loc_') &&
-        colId.substring(4) != state.baseLocale &&
-        (e.values[colId.substring(4)] ?? '').isNotEmpty;
+    final isStaleTranslation = locale != null && state.staleCells.contains((e.key, locale));
 
     Color bg = Colors.transparent;
     if (isError) {

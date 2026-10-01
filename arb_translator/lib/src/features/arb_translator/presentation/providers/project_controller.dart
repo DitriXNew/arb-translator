@@ -50,7 +50,10 @@ class ProjectController extends _$ProjectController {
       // from base file) from keys that are present but empty. This fixes previous heuristic that
       // missed empty-but-present keys.
       Set<String> baseKeys = <String>{};
-      final Set<String> sourceChangedKeys = <String>{};
+      final staleCells = <(String, String)>{
+        for (final entry in entries) ..._staleCellsOf(entry, baseLocale),
+      };
+      if (staleCells.isNotEmpty) logInfo('Stale translations detected: ${staleCells.length} cell(s)');
       try {
         final normalizedPath = path.endsWith(Platform.pathSeparator) ? path.substring(0, path.length - 1) : path;
         final baseFile = File('$normalizedPath${Platform.pathSeparator}$fileNamePrefix$baseLocale.arb');
@@ -59,15 +62,6 @@ class ProjectController extends _$ProjectController {
           // ignore: avoid_slow_async_io (single read on load acceptable)
           final raw = json.decode(await baseFile.readAsString()) as Map<String, dynamic>;
           baseKeys = raw.keys.where((k) => !k.startsWith('@') && k != '@@locale').cast<String>().toSet();
-
-          // Check for source changes based on stored hashes
-          for (final entry in entries) {
-            final currentText = entry.values[baseLocale] ?? '';
-            if (currentText.isNotEmpty && HashUtils.isSourceChanged(currentText, entry.meta.sourceHash)) {
-              sourceChangedKeys.add(entry.key);
-              logInfo('Source changed detected for key: ${entry.key}');
-            }
-          }
         } else {
           logWarning('Base locale file not found when computing baseLocaleKeys: ${baseFile.path}');
         }
@@ -82,7 +76,7 @@ class ProjectController extends _$ProjectController {
         locales: locales,
         entries: entries,
         baseLocaleKeys: baseKeys,
-        sourceChangedKeys: sourceChangedKeys,
+        staleCells: staleCells,
         isLoading: false,
         hasUnsavedChanges: false,
         dirtyCells: <(String, String)>{},
@@ -117,7 +111,7 @@ class ProjectController extends _$ProjectController {
 
     // Update entry values map immutably
     final newValues = Map<String, String>.from(entry.values)..[locale] = text;
-    final newEntry = entry.copyWith(values: newValues);
+    final newEntry = _trackSourceHashes(entry.copyWith(values: newValues), locale: locale, oldText: oldVal);
 
     // Rebuild entries list
     final newEntries = [...state.entries]..[idx] = newEntry;
@@ -135,11 +129,12 @@ class ProjectController extends _$ProjectController {
     final newDirtyCells = Set<(String, String)>.from(state.dirtyCells)..add((key, locale));
     final newDirtyLocales = Set<String>.from(state.dirtyLocales)..add(locale);
 
-    // If we just translated/edited a non-base locale cell, the stale-source
-    // flag for this key is no longer relevant — clear it.
-    final newSourceChangedKeys = (locale != state.baseLocale && state.sourceChangedKeys.contains(key))
-        ? (Set<String>.from(state.sourceChangedKeys)..remove(key))
-        : state.sourceChangedKeys;
+    // Re-derive staleness for this key only: editing one locale refreshes just that
+    // cell, while editing the base text can make every other locale stale (or fresh again).
+    final newStaleCells = <(String, String)>{
+      ...state.staleCells.where((c) => c.$1 != key),
+      ..._staleCellsOf(newEntry, state.baseLocale),
+    };
 
     final prevState = state;
 
@@ -153,7 +148,7 @@ class ProjectController extends _$ProjectController {
       dirtyLocales: newDirtyLocales,
       hasUnsavedChanges: needsUnsavedFlag || state.hasUnsavedChanges,
       errorCells: newErrorCells,
-      sourceChangedKeys: newSourceChangedKeys,
+      staleCells: newStaleCells,
       lastEditedCell: (key, locale),
     );
     state = nextState;
@@ -188,12 +183,17 @@ class ProjectController extends _$ProjectController {
       for (final c in state.errorCells)
         if (c.$1 == oldKey) (newKey, c.$2) else c,
     };
+    final newStaleCells = <(String, String)>{
+      for (final c in state.staleCells)
+        if (c.$1 == oldKey) (newKey, c.$2) else c,
+    };
     final prev = state;
     final next = state.copyWith(
       entries: updated,
       dirtyCells: newDirtyCells,
       hasUnsavedChanges: true,
       errorCells: newErrorCells,
+      staleCells: newStaleCells,
       lastEditedCell: (newKey, state.baseLocale),
     );
     state = next;
@@ -205,12 +205,14 @@ class ProjectController extends _$ProjectController {
     if (updated.length == state.entries.length) return; // nothing removed
     final newDirtyCells = <(String, String)>{...state.dirtyCells.where((c) => c.$1 != key)};
     final newErrorCells = <(String, String)>{...state.errorCells.where((c) => c.$1 != key)};
+    final newStaleCells = <(String, String)>{...state.staleCells.where((c) => c.$1 != key)};
     // Mark deletion by setting unsaved changes; actual removal already done.
     final prev = state;
     final next = state.copyWith(
       entries: updated,
       dirtyCells: newDirtyCells,
       errorCells: newErrorCells,
+      staleCells: newStaleCells,
       hasUnsavedChanges: true,
       lastEditedCell: (key, state.baseLocale),
     );
@@ -271,6 +273,7 @@ class ProjectController extends _$ProjectController {
       entries: filtered,
       dirtyCells: newDirty,
       errorCells: newErrors,
+      staleCells: {...state.staleCells.where((c) => !toRemove.contains(c.$1))},
       hasUnsavedChanges: true,
       lastEditedCell: (toRemove.first, base),
     );
@@ -320,6 +323,7 @@ class ProjectController extends _$ProjectController {
       entries: filtered,
       dirtyCells: newDirty,
       errorCells: newErrors,
+      staleCells: {...state.staleCells.where((c) => !toRemove.contains(c.$1))},
       hasUnsavedChanges: true,
       lastEditedCell: (toRemove.first, base),
     );
@@ -467,7 +471,11 @@ class ProjectController extends _$ProjectController {
       if (sourceText.isNotEmpty) {
         final newHash = HashUtils.computeSourceHash(sourceText);
         final updatedMeta = entry.meta.copyWith(sourceHash: newHash);
-        updatedEntries.add(entry.copyWith(meta: updatedMeta));
+        final updatedHashes = <String, String>{
+          for (final MapEntry(key: locale, value: text) in entry.values.entries)
+            if (locale != baseLocale && text.isNotEmpty) locale: newHash,
+        };
+        updatedEntries.add(entry.copyWith(meta: updatedMeta, sourceHashes: updatedHashes));
       } else {
         updatedEntries.add(entry);
       }
@@ -475,10 +483,45 @@ class ProjectController extends _$ProjectController {
 
     state = state.copyWith(
       entries: updatedEntries,
-      sourceChangedKeys: <String>{}, // Clear all source changed keys
+      staleCells: <(String, String)>{}, // Every current translation is now up to date
       hasUnsavedChanges: true, // Mark as needing save
     );
 
     logInfo('Source hashes committed for ${updatedEntries.length} entries');
+  }
+
+  /// Non-base cells of [entry] whose translation was made from a different base text.
+  static Iterable<(String, String)> _staleCellsOf(TranslationEntry entry, String baseLocale) sync* {
+    final sourceText = entry.values[baseLocale] ?? '';
+    if (sourceText.isEmpty || entry.sourceHashes.isEmpty) return;
+    final currentHash = HashUtils.computeSourceHash(sourceText);
+    for (final MapEntry(key: locale, value: hash) in entry.sourceHashes.entries) {
+      if (locale == baseLocale || (entry.values[locale] ?? '').isEmpty) continue;
+      if (hash != currentHash) yield (entry.key, locale);
+    }
+  }
+
+  /// Keeps [TranslationEntry.sourceHashes] in step with an edit of [locale].
+  ///
+  /// A translation edit records the current base hash for that locale only. A base
+  /// edit pins every translation without a recorded hash to the previous base text
+  /// ([oldText]), so the change shows up as stale instead of being silently accepted.
+  TranslationEntry _trackSourceHashes(TranslationEntry entry, {required String locale, required String oldText}) {
+    final baseLocale = state.baseLocale;
+    final hashes = Map<String, String>.from(entry.sourceHashes);
+    if (locale != baseLocale) {
+      final sourceText = entry.values[baseLocale] ?? '';
+      if ((entry.values[locale] ?? '').isEmpty || sourceText.isEmpty) {
+        hashes.remove(locale);
+      } else {
+        hashes[locale] = HashUtils.computeSourceHash(sourceText);
+      }
+    } else if (oldText.isNotEmpty) {
+      final oldHash = HashUtils.computeSourceHash(oldText);
+      for (final MapEntry(key: l, value: text) in entry.values.entries) {
+        if (l != baseLocale && text.isNotEmpty) hashes.putIfAbsent(l, () => oldHash);
+      }
+    }
+    return entry.copyWith(sourceHashes: hashes);
   }
 }

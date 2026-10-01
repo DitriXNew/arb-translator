@@ -133,9 +133,9 @@ class ProjectToolbar extends ConsumerWidget {
           iconBtn(icon: Icons.redo, tooltip: 'Redo (Ctrl+Y)', onPressed: hasFolder ? controller.redo : null),
           const SizedBox(width: AppSpacing.s),
           // Source hash commit button
-          if (hasFolder && state.sourceChangedKeys.isNotEmpty)
+          if (hasFolder && state.staleCells.isNotEmpty)
             Tooltip(
-              message: 'Commit source hashes for ${state.sourceChangedKeys.length} changed entries',
+              message: 'Commit source hashes for ${state.staleCells.length} stale translations',
               child: IconButton(
                 icon: const Icon(Icons.lock_clock, size: 20),
                 onPressed: () async {
@@ -144,7 +144,7 @@ class ProjectToolbar extends ConsumerWidget {
                     builder: (ctx) => AlertDialog(
                       title: const Text('Commit Source Hashes'),
                       content: Text(
-                        'Update source hashes for ${state.sourceChangedKeys.length} entries with changed source text? '
+                        'Update source hashes for ${state.staleCells.length} stale translations? '
                         'This will mark all current translations as up-to-date.',
                       ),
                       actions: [

@@ -103,11 +103,19 @@ class ArbFileDataSource {
         meta = const EntryMetadata();
       }
       final values = <String, String>{};
+      final sourceHashes = <String, String>{};
       for (final l in locales) {
         final v = perLocale[l]?[key];
         values[l] = v is String ? v : '';
+        if (l == baseLocale || values[l]!.isEmpty) continue;
+        // Each locale file records the EN hash its own translation was made from;
+        // files written before that fall back to the hash stored in the EN file.
+        final localeMeta = perLocale[l]?['@$key'];
+        final localeHash = localeMeta is Map ? localeMeta['sourceHash'] : null;
+        final hash = localeHash is String ? localeHash : meta.sourceHash;
+        if (hash != null) sourceHashes[l] = hash;
       }
-      entries.add(TranslationEntry(key: key, meta: meta, values: values));
+      entries.add(TranslationEntry(key: key, meta: meta, values: values, sourceHashes: sourceHashes));
     }
     return (locales, entries);
   }
@@ -156,11 +164,13 @@ class ArbFileDataSource {
           };
         }
       } else {
-        // Non-base locale: write sourceHash for the EN source string at save time.
-        // This allows detecting stale translations even without the English file.
+        // Non-base locale: write the hash of the EN string this translation was made from,
+        // so a stale translation stays stale across saves (and is detectable without the EN file).
         final sourceText = e.values[baseLocale] ?? '';
-        if (sourceText.isNotEmpty) {
-          map['@${e.key}'] = {'sourceHash': HashUtils.computeSourceHash(sourceText)};
+        final hash =
+            e.sourceHashes[locale] ?? (sourceText.isNotEmpty ? HashUtils.computeSourceHash(sourceText) : null);
+        if (hash != null) {
+          map['@${e.key}'] = {'sourceHash': hash};
         }
       }
     }

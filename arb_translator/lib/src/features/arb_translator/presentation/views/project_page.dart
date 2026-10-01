@@ -210,7 +210,7 @@ class _StatusBar extends ConsumerWidget {
       return false;
     }).length;
     final dirty = state.dirtyCells.length;
-    final sourceChanged = state.sourceChangedKeys.length;
+    final sourceChanged = state.staleCells.map((c) => c.$1).toSet().length;
     final hasFilters = state.searchQuery.isNotEmpty || state.showOnlyErrors || state.showNeedsTranslation;
     return Container(
       height: 26,

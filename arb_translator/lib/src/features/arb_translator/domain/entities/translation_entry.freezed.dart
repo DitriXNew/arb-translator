@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TranslationEntry {
 
- String get key; EntryMetadata get meta; Map<String, String> get values;
+ String get key; EntryMetadata get meta; Map<String, String> get values; Map<String, String> get sourceHashes;
 /// Create a copy of TranslationEntry
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $TranslationEntryCopyWith<TranslationEntry> get copyWith => _$TranslationEntryCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TranslationEntry&&(identical(other.key, key) || other.key == key)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other.values, values));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TranslationEntry&&(identical(other.key, key) || other.key == key)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other.values, values)&&const DeepCollectionEquality().equals(other.sourceHashes, sourceHashes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,key,meta,const DeepCollectionEquality().hash(values));
+int get hashCode => Object.hash(runtimeType,key,meta,const DeepCollectionEquality().hash(values),const DeepCollectionEquality().hash(sourceHashes));
 
 @override
 String toString() {
-  return 'TranslationEntry(key: $key, meta: $meta, values: $values)';
+  return 'TranslationEntry(key: $key, meta: $meta, values: $values, sourceHashes: $sourceHashes)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $TranslationEntryCopyWith<$Res>  {
   factory $TranslationEntryCopyWith(TranslationEntry value, $Res Function(TranslationEntry) _then) = _$TranslationEntryCopyWithImpl;
 @useResult
 $Res call({
- String key, EntryMetadata meta, Map<String, String> values
+ String key, EntryMetadata meta, Map<String, String> values, Map<String, String> sourceHashes
 });
 
 
@@ -65,11 +65,12 @@ class _$TranslationEntryCopyWithImpl<$Res>
 
 /// Create a copy of TranslationEntry
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? key = null,Object? meta = null,Object? values = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? key = null,Object? meta = null,Object? values = null,Object? sourceHashes = null,}) {
   return _then(_self.copyWith(
 key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
 as String,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
 as EntryMetadata,values: null == values ? _self.values : values // ignore: cast_nullable_to_non_nullable
+as Map<String, String>,sourceHashes: null == sourceHashes ? _self.sourceHashes : sourceHashes // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,
   ));
 }
@@ -164,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String key,  EntryMetadata meta,  Map<String, String> values)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String key,  EntryMetadata meta,  Map<String, String> values,  Map<String, String> sourceHashes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TranslationEntry() when $default != null:
-return $default(_that.key,_that.meta,_that.values);case _:
+return $default(_that.key,_that.meta,_that.values,_that.sourceHashes);case _:
   return orElse();
 
 }
@@ -185,10 +186,10 @@ return $default(_that.key,_that.meta,_that.values);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String key,  EntryMetadata meta,  Map<String, String> values)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String key,  EntryMetadata meta,  Map<String, String> values,  Map<String, String> sourceHashes)  $default,) {final _that = this;
 switch (_that) {
 case _TranslationEntry():
-return $default(_that.key,_that.meta,_that.values);case _:
+return $default(_that.key,_that.meta,_that.values,_that.sourceHashes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +206,10 @@ return $default(_that.key,_that.meta,_that.values);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String key,  EntryMetadata meta,  Map<String, String> values)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String key,  EntryMetadata meta,  Map<String, String> values,  Map<String, String> sourceHashes)?  $default,) {final _that = this;
 switch (_that) {
 case _TranslationEntry() when $default != null:
-return $default(_that.key,_that.meta,_that.values);case _:
+return $default(_that.key,_that.meta,_that.values,_that.sourceHashes);case _:
   return null;
 
 }
@@ -220,7 +221,7 @@ return $default(_that.key,_that.meta,_that.values);case _:
 @JsonSerializable()
 
 class _TranslationEntry implements TranslationEntry {
-  const _TranslationEntry({required this.key, this.meta = const EntryMetadata(), final  Map<String, String> values = const <String, String>{}}): _values = values;
+  const _TranslationEntry({required this.key, this.meta = const EntryMetadata(), final  Map<String, String> values = const <String, String>{}, final  Map<String, String> sourceHashes = const <String, String>{}}): _values = values,_sourceHashes = sourceHashes;
   factory _TranslationEntry.fromJson(Map<String, dynamic> json) => _$TranslationEntryFromJson(json);
 
 @override final  String key;
@@ -230,6 +231,13 @@ class _TranslationEntry implements TranslationEntry {
   if (_values is EqualUnmodifiableMapView) return _values;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_values);
+}
+
+ final  Map<String, String> _sourceHashes;
+@override@JsonKey() Map<String, String> get sourceHashes {
+  if (_sourceHashes is EqualUnmodifiableMapView) return _sourceHashes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_sourceHashes);
 }
 
 
@@ -246,16 +254,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TranslationEntry&&(identical(other.key, key) || other.key == key)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other._values, _values));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TranslationEntry&&(identical(other.key, key) || other.key == key)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other._values, _values)&&const DeepCollectionEquality().equals(other._sourceHashes, _sourceHashes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,key,meta,const DeepCollectionEquality().hash(_values));
+int get hashCode => Object.hash(runtimeType,key,meta,const DeepCollectionEquality().hash(_values),const DeepCollectionEquality().hash(_sourceHashes));
 
 @override
 String toString() {
-  return 'TranslationEntry(key: $key, meta: $meta, values: $values)';
+  return 'TranslationEntry(key: $key, meta: $meta, values: $values, sourceHashes: $sourceHashes)';
 }
 
 
@@ -266,7 +274,7 @@ abstract mixin class _$TranslationEntryCopyWith<$Res> implements $TranslationEnt
   factory _$TranslationEntryCopyWith(_TranslationEntry value, $Res Function(_TranslationEntry) _then) = __$TranslationEntryCopyWithImpl;
 @override @useResult
 $Res call({
- String key, EntryMetadata meta, Map<String, String> values
+ String key, EntryMetadata meta, Map<String, String> values, Map<String, String> sourceHashes
 });
 
 
@@ -283,11 +291,12 @@ class __$TranslationEntryCopyWithImpl<$Res>
 
 /// Create a copy of TranslationEntry
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? key = null,Object? meta = null,Object? values = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? key = null,Object? meta = null,Object? values = null,Object? sourceHashes = null,}) {
   return _then(_TranslationEntry(
 key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
 as String,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
 as EntryMetadata,values: null == values ? _self._values : values // ignore: cast_nullable_to_non_nullable
+as Map<String, String>,sourceHashes: null == sourceHashes ? _self._sourceHashes : sourceHashes // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,
   ));
 }

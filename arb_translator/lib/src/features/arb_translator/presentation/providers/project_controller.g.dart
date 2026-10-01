@@ -41,7 +41,7 @@ final class ProjectControllerProvider
   }
 }
 
-String _$projectControllerHash() => r'52d6f64dca88f1001ab3b11a18a942aa9b0dd23f';
+String _$projectControllerHash() => r'9ec7d2c593f0f2baab34f7df1f365e319be2f150';
 
 abstract class _$ProjectController extends $Notifier<ProjectState> {
   ProjectState build();

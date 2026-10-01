@@ -31,9 +31,10 @@ final filteredEntriesProvider = Provider<List<TranslationEntry>>((ref) {
     list = list.where((e) => errorKeys.contains(e.key)).toList();
   }
   if (state.showNeedsTranslation) {
+    final staleKeys = state.staleCells.map((c) => c.$1).toSet();
     list = list.where((e) {
-      // Show if source changed (stale translation)
-      if (state.sourceChangedKeys.contains(e.key)) return true;
+      // Show if any locale holds a stale translation (source changed after it was made)
+      if (staleKeys.contains(e.key)) return true;
       // Show if any non-base locale cell is empty
       for (final l in state.locales) {
         if (l == state.baseLocale) continue;

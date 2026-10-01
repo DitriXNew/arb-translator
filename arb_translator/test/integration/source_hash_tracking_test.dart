@@ -67,9 +67,8 @@ void main() {
       await controller.loadFolder(tempDir.path);
       final state = container.read(projectControllerProvider);
 
-      // Should detect one source change (hello has wrong hash, welcome has no content to compare)
-      expect(state.sourceChangedKeys.length, 1);
-      expect(state.sourceChangedKeys.contains('hello'), isTrue);
+      // hello's stored hash is stale (falls back to the EN file's hash: de file has none)
+      expect(state.staleCells, {('hello', 'de')});
 
       // Verify entry metadata
       final helloEntry = entries.firstWhere((e) => e.key == 'hello');
@@ -85,15 +84,15 @@ void main() {
       await controller.loadFolder(tempDir.path);
       var state = container.read(projectControllerProvider);
 
-      // Should have source changed keys
-      expect(state.sourceChangedKeys.isNotEmpty, isTrue);
+      // Should have stale translations
+      expect(state.staleCells.isNotEmpty, isTrue);
 
       // Commit source hashes
       controller.commitSourceHashes();
       state = container.read(projectControllerProvider);
 
-      // Should clear all source changed keys
-      expect(state.sourceChangedKeys.isEmpty, isTrue);
+      // Should clear all stale translations
+      expect(state.staleCells.isEmpty, isTrue);
       expect(state.hasUnsavedChanges, isTrue);
 
       // All entries should have updated hashes
@@ -134,8 +133,8 @@ void main() {
       await controller2.loadFolder(tempDir.path);
       final state2 = container2.read(projectControllerProvider);
 
-      // Should have no source changed keys since hashes are up to date
-      expect(state2.sourceChangedKeys.isEmpty, isTrue);
+      // Should have no stale translations since hashes are up to date
+      expect(state2.staleCells.isEmpty, isTrue);
     });
 
     test('handles new entries without source hashes', () async {
@@ -154,7 +153,7 @@ void main() {
       final state = container.read(projectControllerProvider);
 
       // New entries without hashes should not be marked as changed
-      expect(state.sourceChangedKeys.isEmpty, isTrue);
+      expect(state.staleCells.isEmpty, isTrue);
 
       final entry = state.entries.first;
       expect(entry.meta.sourceHash, isNull);

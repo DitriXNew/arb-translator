@@ -17,6 +17,11 @@ _TranslationEntry _$TranslationEntryFromJson(Map<String, dynamic> json) =>
             (k, e) => MapEntry(k, e as String),
           ) ??
           const <String, String>{},
+      sourceHashes:
+          (json['sourceHashes'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, e as String),
+          ) ??
+          const <String, String>{},
     );
 
 Map<String, dynamic> _$TranslationEntryToJson(_TranslationEntry instance) =>
@@ -24,4 +29,5 @@ Map<String, dynamic> _$TranslationEntryToJson(_TranslationEntry instance) =>
       'key': instance.key,
       'meta': instance.meta,
       'values': instance.values,
+      'sourceHashes': instance.sourceHashes,
     };

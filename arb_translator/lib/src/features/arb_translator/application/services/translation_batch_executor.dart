@@ -44,11 +44,11 @@ class TranslationBatchExecutor {
     // Filter candidates for translation.
     // In onlyEmpty mode: include keys with no translation OR where the EN source has changed
     // (so stale translations get refreshed automatically alongside empty ones).
-    final sourceChangedKeys = controller.sourceChangedKeys;
+    final staleCells = controller.staleCells;
     final candidates = <TranslationEntry>[
       for (final e in entries)
         if ((e.values[baseLocale] ?? '').isNotEmpty)
-          if (!onlyEmpty || (e.values[targetLocale] ?? '').isEmpty || sourceChangedKeys.contains(e.key)) e,
+          if (!onlyEmpty || (e.values[targetLocale] ?? '').isEmpty || staleCells.contains((e.key, targetLocale))) e,
     ];
 
     if (candidates.isEmpty) {
