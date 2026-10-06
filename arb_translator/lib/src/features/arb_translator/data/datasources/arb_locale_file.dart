@@ -35,10 +35,13 @@ class ArbLocaleFile {
 
   /// Sets [key] to [text] and its `sourceHash` attribute to [sourceHash] (removed when null).
   ///
-  /// Other attributes of `@key` are kept. A new key goes before the first existing key that
-  /// sorts after it, so a sorted file stays sorted. Setting what is already there is no change.
+  /// Other attributes of `@key` are kept. An existing key and its `@key` stay where they are;
+  /// `@key` added to an existing key goes right after it. A new key goes before the first
+  /// existing key that sorts after it, so a sorted file stays sorted. Setting what is already
+  /// there is no change.
   void setTranslation(String key, String text, {required String? sourceHash}) {
-    final oldMeta = _data['@$key'];
+    final metaKey = '@$key';
+    final oldMeta = _data[metaKey];
     final meta = <String, dynamic>{if (oldMeta is Map) ...Map<String, dynamic>.from(oldMeta)};
     if (sourceHash == null) {
       meta.remove('sourceHash');
@@ -47,26 +50,26 @@ class ArbLocaleFile {
     }
     final oldHash = oldMeta is Map ? oldMeta['sourceHash'] : null;
     if (_data[key] == text && oldHash == sourceHash) return;
+    _changed = true;
 
-    final isNew = !_data.containsKey(key);
-    final rebuilt = <String, dynamic>{};
-    var placed = false;
-    void place() {
-      rebuilt[key] = text;
-      if (meta.isNotEmpty) rebuilt['@$key'] = meta;
-      placed = true;
-    }
-
-    for (final MapEntry(key: k, value: v) in _data.entries) {
-      if (k == key || k == '@$key') {
-        if (!placed) place();
-        continue;
+    if (_data.containsKey(key)) {
+      _data[key] = text;
+      if (meta.isEmpty) {
+        _data.remove(metaKey);
+      } else if (_data.containsKey(metaKey)) {
+        _data[metaKey] = meta;
+      } else {
+        _insert(before: _keyAfter(key), entries: {metaKey: meta});
       }
-      if (!placed && isNew && !k.startsWith('@') && k.compareTo(key) > 0) place();
-      rebuilt[k] = v;
+      return;
     }
-    if (!placed) place();
-    _replaceWith(rebuilt);
+
+    // A stray `@key` without its value moves next to the new value.
+    _data.remove(metaKey);
+    _insert(
+      before: _data.keys.where((k) => !k.startsWith('@')).where((k) => k.compareTo(key) > 0).firstOrNull,
+      entries: {key: text, if (meta.isNotEmpty) metaKey: meta},
+    );
   }
 
   /// Removes [key] and its `@key` attributes, whatever the value.
@@ -87,10 +90,23 @@ class ArbLocaleFile {
 
   Future<void> save() => file.writeAsString(encode());
 
-  void _replaceWith(Map<String, dynamic> rebuilt) {
+  /// The key that follows [key] in the file, or null when [key] is last.
+  String? _keyAfter(String key) {
+    final keys = _data.keys.toList();
+    final index = keys.indexOf(key);
+    return index + 1 < keys.length ? keys[index + 1] : null;
+  }
+
+  /// Inserts [entries] in front of [before], or at the end when it is null.
+  void _insert({required String? before, required Map<String, dynamic> entries}) {
+    final rebuilt = <String, dynamic>{};
+    for (final MapEntry(key: k, value: v) in _data.entries) {
+      if (k == before) rebuilt.addAll(entries);
+      rebuilt[k] = v;
+    }
+    if (before == null) rebuilt.addAll(entries);
     _data
       ..clear()
       ..addAll(rebuilt);
-    _changed = true;
   }
 }

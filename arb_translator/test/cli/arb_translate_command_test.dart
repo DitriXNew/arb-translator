@@ -242,6 +242,49 @@ void main() {
     expect(read('de')['files'], '{count, plural, =1{Segment} other{{count} Segmente}}');
   });
 
+  test('a translation with an unclosed plural is rejected', () async {
+    arb('en').writeAsStringSync(json.encode({'@@locale': 'en', 'files': '{count, plural, one{One} other{Many}}'}));
+    final strategy = _ScriptedStrategy(answers: {'files': '{count, plural, one{Eins} other{Viele}'});
+
+    expect(await runCli(['--locales', 'de'], strategy: strategy), CliExitCode.partialFailure);
+    expect(read('de').containsKey('files'), isFalse);
+  });
+
+  test('a locale file not named <prefix><locale>.arb is a usage error, and nothing is written', () async {
+    arb('de').renameSync(p.join(dir.path, 'legacy_de.arb'));
+
+    expect(await runCli(['--locales', 'de', '--remove-orphans']), CliExitCode.usage);
+
+    expect(err.toString(), contains('legacy_de.arb'));
+    expect(arb('de').existsSync(), isFalse);
+    expect(json.decode(File(p.join(dir.path, 'legacy_de.arb')).readAsStringSync()), containsPair('orphan', 'Verwaist'));
+  });
+
+  test('an .arb file whose name is not a locale is a usage error', () async {
+    File(p.join(dir.path, 'app_notes.arb')).writeAsStringSync(json.encode({'alpha': 'note'}));
+
+    expect(await runCli(['--locales', 'de']), CliExitCode.usage);
+    expect(err.toString(), contains('app_notes.arb'));
+  });
+
+  test('an @@locale that is not a non-empty string is a usage error naming the file', () async {
+    arb('fr').writeAsStringSync(json.encode({'@@locale': 7, 'alpha': 'Premier mot'}));
+    expect(await runCli(['--locales', 'de']), CliExitCode.usage);
+    expect(err.toString(), contains('app_fr.arb'));
+
+    arb('fr').deleteSync();
+    File(p.join(dir.path, 'app_.arb')).writeAsStringSync(json.encode({'@@locale': '', 'alpha': 'x'}));
+    expect(await runCli([]), CliExitCode.usage);
+    expect(err.toString(), contains('app_.arb'));
+  });
+
+  test('a locale file whose @@locale disagrees with its name is a usage error', () async {
+    arb('fr').writeAsStringSync(json.encode({'@@locale': 'it', 'alpha': 'Primo'}));
+
+    expect(await runCli(['--locales', 'de']), CliExitCode.usage);
+    expect(err.toString(), contains('app_fr.arb'));
+  });
+
   test('a dry run changes no file', () async {
     final before = {
       for (final l in ['en', 'de', 'fr']) l: arb(l).readAsStringSync(),

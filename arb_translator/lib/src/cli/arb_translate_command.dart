@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:arb_translator/src/cli/cli_options.dart';
@@ -66,9 +67,11 @@ class ArbTranslateCommand {
     final directory = options.directory;
     if (!Directory(directory).existsSync()) throw CliUsageException('Folder not found: $directory');
 
+    await _checkDeclaredLocales(directory);
     final (baseLocale, locales, loaded, prefix) = await LoadArbFolder(TranslationRepositoryImpl(_files))(directory);
     final baseFile = File('$directory/$prefix$baseLocale.arb');
     if (!baseFile.existsSync()) throw CliUsageException('Template not found: ${baseFile.path}');
+    await _checkLocaleFileNames(directory, prefix);
     final baseKeys = {
       for (final key in (await _files.readArb(baseFile)).keys)
         if (!key.startsWith('@')) key,
@@ -218,6 +221,7 @@ class ArbTranslateCommand {
     if (!placeholdersMatch(english: english, target: extractPlaceholdersFromText(text))) {
       return 'placeholders differ from the template, translation rejected: "$text"';
     }
+    if (!hasBalancedBraces(text)) return 'unbalanced braces, translation rejected: "$text"';
     final oldText = entry.values[locale] ?? '';
     entries[index] = TranslationCells.trackSourceHashes(
       entry.copyWith(values: {...entry.values, locale: text}),
@@ -244,6 +248,40 @@ class ArbTranslateCommand {
       await file.save();
     }
     out.writeln('Wrote $names');
+  }
+
+  /// A declared `@@locale` must be a non-empty string; the loader would otherwise crash on it or
+  /// take `""` for a locale.
+  Future<void> _checkDeclaredLocales(String directory) async {
+    for (final file in await _files.listArbFiles(directory)) {
+      final data = await _files.readArb(file);
+      final declared = data['@@locale'];
+      if (data.containsKey('@@locale') && (declared is! String || declared.trim().isEmpty)) {
+        throw CliUsageException(
+          '${p.basename(file.path)}: "@@locale" must be a locale name, not ${json.encode(declared)}.',
+        );
+      }
+    }
+  }
+
+  /// Every `.arb` file must be `<prefix><locale>.arb`, its locale read the way the loader
+  /// reads it: `@@locale`, else the locale the file name ends in.
+  ///
+  /// Locale files are opened by that name. A file under any other name would be read as some
+  /// locale (one without either is read as the template), and a stale copy would be left
+  /// beside a newly created `<prefix><locale>.arb`. Runs before anything loaded is used.
+  Future<void> _checkLocaleFileNames(String directory, String prefix) async {
+    for (final file in await _files.listArbFiles(directory)) {
+      final name = p.basename(file.path);
+      final declared = (await _files.readArb(file))['@@locale'];
+      final locale = declared is String ? declared : TranslationRepositoryImpl.localeFromFileName(name);
+      if (locale == null || name != '$prefix$locale.arb') {
+        throw CliUsageException(
+          '$name: not a locale file of this folder. Expected <prefix><locale>.arb, here '
+          '$prefix${locale ?? '<locale>'}.arb, with a matching "@@locale"; rename the file or fix its @@locale.',
+        );
+      }
+    }
   }
 
   String? _readGlossary(String? path) {

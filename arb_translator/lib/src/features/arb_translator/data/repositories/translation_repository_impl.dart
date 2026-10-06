@@ -23,7 +23,7 @@ class TranslationRepositoryImpl implements TranslationRepository {
     final localeToFile = <String, File>{};
     for (final f in files) {
       final map = await fileDs.readArb(f);
-      final locale = (map['@@locale'] as String?) ?? _inferLocaleFromName(f);
+      final locale = (map['@@locale'] as String?) ?? localeFromFileName(f.uri.pathSegments.last) ?? 'en';
       perLocale[locale] = map;
       localeToFile[locale] = f;
     }
@@ -70,9 +70,7 @@ class TranslationRepositoryImpl implements TranslationRepository {
     return 'app_';
   }
 
-  String _inferLocaleFromName(File f) {
-    final name = f.uri.pathSegments.last;
-    final match = RegExp(r'_([a-z]{2}(?:_[A-Z]{2})?)\.arb$').firstMatch(name);
-    return match != null ? match.group(1)! : 'en';
-  }
+  /// The locale a file name ends in (`app_de.arb` → `de`, `app_pt_BR.arb` → `pt_BR`), or null.
+  static String? localeFromFileName(String name) =>
+      RegExp(r'_([a-z]{2}(?:_[A-Z]{2})?)\.arb$').firstMatch(name)?.group(1);
 }
