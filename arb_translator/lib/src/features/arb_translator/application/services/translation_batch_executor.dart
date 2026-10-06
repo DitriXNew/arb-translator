@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:arb_translator/src/core/services/log_service.dart';
-import 'package:arb_translator/src/features/arb_translator/domain/ai/ai_translation_strategy.dart';
-import 'package:arb_translator/src/features/arb_translator/domain/entities/translation_entry.dart';
+import 'package:arb_translator/src/features/arb_translator/application/services/batch_translation_runner.dart';
+import 'package:arb_translator/src/features/arb_translator/domain/services/translation_cells.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_errors_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_settings_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_strategy_registry.dart';
@@ -11,8 +11,8 @@ import 'package:arb_translator/src/features/arb_translator/presentation/provider
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/translation_progress_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Batch size for translation
-const int kTranslationBatchSize = 100;
+export 'package:arb_translator/src/features/arb_translator/application/services/batch_translation_runner.dart'
+    show kTranslationBatchSize;
 
 /// Encapsulates bulk AI translation logic with batch processing.
 /// Uses structured output (JSON schema) for efficient translation of multiple strings.
@@ -41,15 +41,15 @@ class TranslationBatchExecutor {
     final strategy = ref.read(currentAiStrategyProvider);
     final entries = controller.entries;
 
-    // Filter candidates for translation.
-    // In onlyEmpty mode: include keys with no translation OR where the EN source has changed
+    // In onlyEmpty mode: keys with no translation OR whose EN source has changed
     // (so stale translations get refreshed automatically alongside empty ones).
-    final staleCells = controller.staleCells;
-    final candidates = <TranslationEntry>[
-      for (final e in entries)
-        if ((e.values[baseLocale] ?? '').isNotEmpty)
-          if (!onlyEmpty || (e.values[targetLocale] ?? '').isEmpty || staleCells.contains((e.key, targetLocale))) e,
-    ];
+    final candidates = TranslationCells.translationCandidates(
+      entries: entries,
+      baseLocale: baseLocale,
+      targetLocale: targetLocale,
+      onlyMissing: onlyEmpty,
+      staleCells: controller.staleCells,
+    );
 
     if (candidates.isEmpty) {
       logInfo('No candidates for translation');
@@ -69,45 +69,23 @@ class TranslationBatchExecutor {
     localeProgress.start(targetLocale, candidates.length);
     globalProgress.start(candidates.length);
 
-    // Split into batches of kTranslationBatchSize
-    final batches = <List<TranslationEntry>>[];
-    for (var i = 0; i < candidates.length; i += kTranslationBatchSize) {
-      batches.add(candidates.sublist(i, (i + kTranslationBatchSize).clamp(0, candidates.length)));
+    var totalProcessed = 0;
+    void advance(int count) {
+      totalProcessed += count;
+      localeProgress.updateProgress(targetLocale, totalProcessed);
+      globalProgress.updateDone(totalProcessed);
     }
 
-    logInfo('Split into ${batches.length} batches of up to $kTranslationBatchSize items');
-
-    var totalProcessed = 0;
-
-    for (var batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-      // Check for cancellation
-      final progressState = ref.read(localeTranslationProgressProvider);
-      if (progressState.isCancelRequested(targetLocale)) {
-        logInfo('Batch translation cancelled by user after batch $batchIndex');
-        break;
-      }
-
-      final batch = batches[batchIndex];
-      logDebug('Processing batch ${batchIndex + 1}/${batches.length} with ${batch.length} items');
-
-      try {
-        // Prepare items for batch
-        final batchItems = batch
-            .map(
-              (e) =>
-                  BatchTranslationItem(key: e.key, text: e.values[baseLocale] ?? '', description: e.meta.description),
-            )
-            .toList();
-
-        // Execute batch translation
-        final translations = await strategy.translateBatch(
-          apiKey: apiKey,
-          items: batchItems,
-          targetLocale: targetLocale,
-          glossaryPrompt: glossary,
-        );
-
-        // Apply translations
+    await BatchTranslationRunner(strategy: strategy, apiKey: apiKey, glossaryPrompt: glossary).run(
+      candidates: candidates,
+      baseLocale: baseLocale,
+      targetLocale: targetLocale,
+      isCancelled: () {
+        final cancelled = ref.read(localeTranslationProgressProvider).isCancelRequested(targetLocale);
+        if (cancelled) logInfo('Batch translation cancelled by user after $totalProcessed item(s)');
+        return cancelled;
+      },
+      onBatchTranslated: (batch, translations) {
         final projectController = ref.read(projectControllerProvider.notifier);
         for (final entry in batch) {
           final translation = translations[entry.key];
@@ -123,28 +101,20 @@ class TranslationBatchExecutor {
                 .add(key: entry.key, locale: targetLocale, message: 'No translation received from AI');
           }
         }
-
-        totalProcessed += batch.length;
-        localeProgress.updateProgress(targetLocale, totalProcessed);
-        globalProgress.updateDone(totalProcessed);
-
-        logDebug('Batch ${batchIndex + 1} completed: ${translations.length}/${batch.length} translations applied');
-      } catch (ex, st) {
-        logError('Batch ${batchIndex + 1} failed', ex, st);
-
-        // Add errors for all batch items
+        advance(batch.length);
+        logDebug('Batch completed: ${translations.length}/${batch.length} translations applied');
+      },
+      onBatchFailed: (batch, error, stackTrace) {
+        logError('Batch of ${batch.length} failed', error, stackTrace);
         for (final entry in batch) {
           ref
               .read(aiErrorsProvider.notifier)
-              .add(key: entry.key, locale: targetLocale, message: 'Batch translation failed: $ex');
+              .add(key: entry.key, locale: targetLocale, message: 'Batch translation failed: $error');
         }
-
         // Update progress even on error
-        totalProcessed += batch.length;
-        localeProgress.updateProgress(targetLocale, totalProcessed);
-        globalProgress.updateDone(totalProcessed);
-      }
-    }
+        advance(batch.length);
+      },
+    );
 
     final finalProgress = ref.read(localeTranslationProgressProvider).getProgress(targetLocale);
     logInfo(

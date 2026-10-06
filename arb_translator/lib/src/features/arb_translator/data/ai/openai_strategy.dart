@@ -1,12 +1,16 @@
 import 'package:arb_translator/src/features/arb_translator/application/services/prompt_builder.dart';
 import 'package:arb_translator/src/features/arb_translator/data/datasources/openai_remote_datasource.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/ai/ai_translation_strategy.dart';
+import 'package:arb_translator/src/features/arb_translator/domain/entities/ai_settings.dart';
 
 class OpenAiTranslationStrategy implements AiTranslationStrategy {
-  OpenAiTranslationStrategy(this._ds, {PromptBuilder? promptBuilder})
+  /// [endpoint] is a chat-completions URL; leave it null for OpenAI itself.
+  OpenAiTranslationStrategy(this._ds, {PromptBuilder? promptBuilder, this.model = kDefaultAiModel, this.endpoint})
     : _promptBuilder = promptBuilder ?? const PromptBuilder();
   final OpenAiRemoteDataSource _ds;
   final PromptBuilder _promptBuilder;
+  final String model;
+  final Uri? endpoint;
 
   @override
   String get id => 'openai';
@@ -28,8 +32,7 @@ class OpenAiTranslationStrategy implements AiTranslationStrategy {
       description: description,
       glossary: glossaryPrompt,
     );
-    // Model is set via kDefaultAiModel constant in openai_remote_datasource.dart
-    return _ds.translate(apiKey: apiKey, prompt: prompt);
+    return _ds.translate(apiKey: apiKey, prompt: prompt, model: model, endpoint: endpoint);
   }
 
   @override
@@ -49,6 +52,8 @@ class OpenAiTranslationStrategy implements AiTranslationStrategy {
       items: dsItems,
       targetLocale: targetLocale,
       glossaryPrompt: glossaryPrompt,
+      model: model,
+      endpoint: endpoint,
     );
   }
 }

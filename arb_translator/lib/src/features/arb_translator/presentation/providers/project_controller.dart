@@ -9,6 +9,7 @@ import 'package:arb_translator/src/features/arb_translator/application/validatio
 import 'package:arb_translator/src/features/arb_translator/data/datasources/arb_file_datasource.dart';
 import 'package:arb_translator/src/features/arb_translator/data/repositories/translation_repository_impl.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/entities/translation_entry.dart';
+import 'package:arb_translator/src/features/arb_translator/domain/services/translation_cells.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/usecases/load_arb_folder.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/active_cell_translation_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_errors_provider.dart';
@@ -50,9 +51,7 @@ class ProjectController extends _$ProjectController {
       // from base file) from keys that are present but empty. This fixes previous heuristic that
       // missed empty-but-present keys.
       Set<String> baseKeys = <String>{};
-      final staleCells = <(String, String)>{
-        for (final entry in entries) ..._staleCellsOf(entry, baseLocale),
-      };
+      final staleCells = TranslationCells.staleCellsIn(entries, baseLocale);
       if (staleCells.isNotEmpty) logInfo('Stale translations detected: ${staleCells.length} cell(s)');
       try {
         final normalizedPath = path.endsWith(Platform.pathSeparator) ? path.substring(0, path.length - 1) : path;
@@ -111,7 +110,12 @@ class ProjectController extends _$ProjectController {
 
     // Update entry values map immutably
     final newValues = Map<String, String>.from(entry.values)..[locale] = text;
-    final newEntry = _trackSourceHashes(entry.copyWith(values: newValues), locale: locale, oldText: oldVal);
+    final newEntry = TranslationCells.trackSourceHashes(
+      entry.copyWith(values: newValues),
+      baseLocale: state.baseLocale,
+      locale: locale,
+      oldText: oldVal,
+    );
 
     // Rebuild entries list
     final newEntries = [...state.entries]..[idx] = newEntry;
@@ -133,7 +137,7 @@ class ProjectController extends _$ProjectController {
     // cell, while editing the base text can make every other locale stale (or fresh again).
     final newStaleCells = <(String, String)>{
       ...state.staleCells.where((c) => c.$1 != key),
-      ..._staleCellsOf(newEntry, state.baseLocale),
+      ...TranslationCells.staleCellsOf(newEntry, state.baseLocale),
     };
 
     final prevState = state;
@@ -488,40 +492,5 @@ class ProjectController extends _$ProjectController {
     );
 
     logInfo('Source hashes committed for ${updatedEntries.length} entries');
-  }
-
-  /// Non-base cells of [entry] whose translation was made from a different base text.
-  static Iterable<(String, String)> _staleCellsOf(TranslationEntry entry, String baseLocale) sync* {
-    final sourceText = entry.values[baseLocale] ?? '';
-    if (sourceText.isEmpty || entry.sourceHashes.isEmpty) return;
-    final currentHash = HashUtils.computeSourceHash(sourceText);
-    for (final MapEntry(key: locale, value: hash) in entry.sourceHashes.entries) {
-      if (locale == baseLocale || (entry.values[locale] ?? '').isEmpty) continue;
-      if (hash != currentHash) yield (entry.key, locale);
-    }
-  }
-
-  /// Keeps [TranslationEntry.sourceHashes] in step with an edit of [locale].
-  ///
-  /// A translation edit records the current base hash for that locale only. A base
-  /// edit pins every translation without a recorded hash to the previous base text
-  /// ([oldText]), so the change shows up as stale instead of being silently accepted.
-  TranslationEntry _trackSourceHashes(TranslationEntry entry, {required String locale, required String oldText}) {
-    final baseLocale = state.baseLocale;
-    final hashes = Map<String, String>.from(entry.sourceHashes);
-    if (locale != baseLocale) {
-      final sourceText = entry.values[baseLocale] ?? '';
-      if ((entry.values[locale] ?? '').isEmpty || sourceText.isEmpty) {
-        hashes.remove(locale);
-      } else {
-        hashes[locale] = HashUtils.computeSourceHash(sourceText);
-      }
-    } else if (oldText.isNotEmpty) {
-      final oldHash = HashUtils.computeSourceHash(oldText);
-      for (final MapEntry(key: l, value: text) in entry.values.entries) {
-        if (l != baseLocale && text.isNotEmpty) hashes.putIfAbsent(l, () => oldHash);
-      }
-    }
-    return entry.copyWith(sourceHashes: hashes);
   }
 }
