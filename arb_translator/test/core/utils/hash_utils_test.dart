@@ -12,6 +12,13 @@ void main() {
       expect(hash1, isNotEmpty);
     });
 
+    test('computeSourceHash is the SHA-256 hex digest that locale files already store', () {
+      expect(
+        HashUtils.computeSourceHash('Hello {name}'),
+        '833583c574131c1ec81313e982643b9f5fba312df50f7c97db0572ad1ce5a929',
+      );
+    });
+
     test('computeSourceHash returns different hash for different text', () {
       const text1 = 'Hello world';
       const text2 = 'Hello universe';

@@ -5,7 +5,6 @@ import 'package:arb_translator/src/features/arb_translator/data/datasources/arb_
 import 'package:arb_translator/src/features/arb_translator/data/repositories/translation_repository_impl.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/usecases/load_arb_folder.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
-import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Integration-style test (filesystem) for: load -> edit -> save -> reload.
@@ -37,24 +36,16 @@ void main() {
     });
 
     test('cycle maintains metadata, adds new translation, placeholder validation ok', () async {
-      final repo = TranslationRepositoryImpl(ds);
-      final loader = LoadArbFolder(repo);
-      final (baseLocale, locales, entries, _) = await loader(tempDir.path);
-      expect(baseLocale, 'en');
-      expect(locales, ['en', 'de']);
-      // Controller with loaded state
+      final loader = LoadArbFolder(TranslationRepositoryImpl(ds));
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final controller = container.read(projectControllerProvider.notifier);
       // Keep provider alive during async ops (auto-dispose otherwise after first await).
       final sub = container.listen(projectControllerProvider, (_, _) {});
       addTearDown(sub.close);
-      controller.state = ProjectState(
-        folderPath: tempDir.path,
-        baseLocale: baseLocale,
-        locales: locales,
-        entries: entries,
-      );
+      await controller.loadFolder(tempDir.path, rethrowOnError: true);
+      expect(controller.state.baseLocale, 'en');
+      expect(controller.state.locales, ['en', 'de']);
       // Edit: add German bye translation
       controller.updateCell(key: 'bye', locale: 'de', text: 'Tschüss');
       expect(controller.state.dirtyCells.contains(('bye', 'de')), isTrue);

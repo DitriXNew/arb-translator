@@ -7,7 +7,7 @@ import 'package:arb_translator/src/features/arb_translator/domain/entities/entry
 
 void main() {
   group('ProjectController basic mutations', () {
-    test('updateCell marks dirty and validates placeholders', () {
+    test('updateCell stores the value, marks it dirty and validates placeholders', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final controller = container.read(projectControllerProvider.notifier);
@@ -25,7 +25,9 @@ void main() {
       );
       controller.updateCell(key: 'hello', locale: 'de', text: 'Hallo {name}');
       final s = container.read(projectControllerProvider);
+      expect(s.entries.single.values['de'], 'Hallo {name}');
       expect(s.dirtyCells.contains(('hello', 'de')), isTrue);
+      expect(s.hasUnsavedChanges, isTrue);
       expect(s.errorCells.contains(('hello', 'de')), isFalse);
     });
 

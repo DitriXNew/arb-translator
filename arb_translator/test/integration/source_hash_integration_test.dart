@@ -110,19 +110,11 @@ void main() {
       final (baseLocale, locales, entries, _) = await loader(tempDir.path);
       expect(entries, hasLength(2));
 
-      // Update hashes for all entries
-      final updatedEntries = entries.map((entry) {
-        final sourceText = entry.values[baseLocale] ?? '';
-        if (sourceText.isNotEmpty) {
-          final newHash = HashUtils.computeSourceHash(sourceText);
-          return entry.copyWith(meta: entry.meta.copyWith(sourceHash: newHash));
-        }
-        return entry;
-      }).toList();
+      expect(entries.map((e) => e.meta.sourceHash), everyElement(isNull), reason: 'the template has no hashes yet');
 
-      // Save updated data
+      // Save: the serializer computes the current base hash itself.
       for (final locale in locales) {
-        final data = dataSource.serializeLocale(entries: updatedEntries, locale: locale, baseLocale: baseLocale);
+        final data = dataSource.serializeLocale(entries: entries, locale: locale, baseLocale: baseLocale);
         await dataSource.writeArb(folderPath: tempDir.path, locale: locale, fileNamePrefix: 'app_', data: data);
       }
 
@@ -161,16 +153,11 @@ void main() {
       final (baseLocale, locales, entries, _) = await loader(tempDir.path);
       expect(entries, hasLength(1));
 
-      final entry = entries.first;
+      expect(entries.first.meta.sourceHash, isNull);
+      final newHash = HashUtils.computeSourceHash('Hello {name}');
 
-      // Add hash
-      final sourceText = entry.values[baseLocale] ?? '';
-      final newHash = HashUtils.computeSourceHash(sourceText);
-      final updatedEntry = entry.copyWith(meta: entry.meta.copyWith(sourceHash: newHash));
-
-      // Save
+      // Save: the serializer adds the hash next to the existing metadata.
       for (final locale in locales) {
-        final entries = [updatedEntry];
         final data = dataSource.serializeLocale(entries: entries, locale: locale, baseLocale: baseLocale);
         await dataSource.writeArb(folderPath: tempDir.path, locale: locale, fileNamePrefix: 'app_', data: data);
       }

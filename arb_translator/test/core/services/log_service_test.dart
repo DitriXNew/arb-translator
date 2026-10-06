@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:arb_translator/src/core/services/log_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logger/logger.dart' show Level, LogEvent, OutputEvent;
 import 'package:path/path.dart' as p;
 
 void main() {
@@ -71,33 +72,26 @@ void main() {
       expect(recentLogs, isA<String>());
     });
 
-    test('clearLogs works when file exists', () async {
-      await logService.clearLogs();
-      // Should not throw an exception
+    test('clearLogs completes', () async {
+      await expectLater(logService.clearLogs(), completes);
     });
   });
 
   group('FileOutput', () {
-    test('creates valid file output', () {
-      final tempFile = File(p.join(Directory.systemTemp.path, 'test_log.txt'));
-      final fileOutput = FileOutput(file: tempFile);
+    test('appends each line with a timestamp', () async {
+      final dir = Directory.systemTemp.createTempSync('file_output_test');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final file = File(p.join(dir.path, 'log.txt'));
 
-      // Test basic functionality - just verify it doesn't throw
-      expect(fileOutput, isNotNull);
+      FileOutput(file: file).output(OutputEvent(LogEvent(Level.info, 'm'), ['first line', 'second line']));
 
-      // Cleanup
-      if (tempFile.existsSync()) {
-        tempFile.deleteSync();
+      // The append is fire-and-forget; wait for it to land.
+      for (var i = 0; i < 50 && !(file.existsSync() && file.readAsStringSync().contains('second line')); i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
       }
-    });
-  });
-
-  group('DebugOutput', () {
-    test('creates valid debug output', () {
-      final debugOutput = DebugOutput();
-
-      // Test basic functionality - just verify it doesn't throw
-      expect(debugOutput, isNotNull);
+      final lines = file.readAsLinesSync();
+      expect(lines, hasLength(2));
+      expect(lines.first, matches(RegExp(r'^\d{4}-\d{2}-\d{2}T\S+ first line$')));
     });
   });
 }
