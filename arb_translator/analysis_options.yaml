@@ -50,6 +50,13 @@ analyzer:
     - '**/*.config.dart'
     - '**/generated/**'
     - 'test/**'
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   rules:

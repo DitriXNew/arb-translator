@@ -19,10 +19,11 @@ class LogService {
   Future<void> initialize() async {
     if (_isInitialized) return;
 
-    // Create log file in application directory
-    final executable = Platform.resolvedExecutable;
-    final appDir = Directory(p.dirname(executable));
-    final logDir = Directory(p.join(appDir.path, 'logs'));
+    // Windows/Linux: next to the executable. macOS: the sandbox forbids writing into the
+    // app bundle, so use ~/Library/Logs (the app container's when sandboxed).
+    final Directory logDir = Platform.isMacOS
+        ? Directory(p.join(Platform.environment['HOME']!, 'Library', 'Logs', 'arb_translator'))
+        : Directory(p.join(p.dirname(Platform.resolvedExecutable), 'logs'));
 
     if (!logDir.existsSync()) {
       logDir.createSync(recursive: true);
