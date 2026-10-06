@@ -15,37 +15,29 @@ class PlaceholderValidator {
     required TranslationEntry entry,
     required String locale,
     required String baseLocale,
-    required List<TranslationEntry> allEntries,
     required Set<(String, String)> previousErrors,
   }) {
     final english = entry.values[baseLocale] ?? '';
     final englishPlaceholders = extractPlaceholdersFromText(english);
     final newErrors = Set<(String, String)>.from(previousErrors);
 
-    if (locale == baseLocale) {
-      // Revalidate all locales for this key
-      for (final l in allEntries.firstWhere((e) => e.key == entry.key).values.keys) {
-        if (l == baseLocale) continue;
-      }
-      // Iterate locales list from entry values
-      for (final l in entry.values.keys) {
-        if (l == baseLocale) continue;
-        final target = entry.values[l] ?? '';
-        final tPh = extractPlaceholdersFromText(target);
-        if (placeholdersMatch(english: englishPlaceholders, target: tPh)) {
-          newErrors.remove((entry.key, l));
-        } else {
-          newErrors.add((entry.key, l));
-        }
-      }
-    } else {
-      final target = entry.values[locale] ?? '';
-      final tPh = extractPlaceholdersFromText(target);
-      if (placeholdersMatch(english: englishPlaceholders, target: tPh)) {
-        newErrors.remove((entry.key, locale));
+    void check(String l) {
+      final target = entry.values[l] ?? '';
+      final valid =
+          placeholdersMatch(english: englishPlaceholders, target: extractPlaceholdersFromText(target)) &&
+          hasBalancedBraces(target);
+      if (valid) {
+        newErrors.remove((entry.key, l));
       } else {
-        newErrors.add((entry.key, locale));
+        newErrors.add((entry.key, l));
       }
+    }
+
+    if (locale == baseLocale) {
+      // A base edit revalidates every locale of this key.
+      entry.values.keys.where((l) => l != baseLocale).forEach(check);
+    } else {
+      check(locale);
     }
     return newErrors;
   }

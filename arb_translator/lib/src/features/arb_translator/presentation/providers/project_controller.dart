@@ -125,7 +125,6 @@ class ProjectController extends _$ProjectController {
       entry: newEntry,
       locale: locale,
       baseLocale: state.baseLocale,
-      allEntries: state.entries,
       previousErrors: state.errorCells,
     );
 

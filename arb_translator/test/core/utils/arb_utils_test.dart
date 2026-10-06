@@ -30,6 +30,21 @@ void main() {
       expect(placeholdersMatch(english: english, target: german), isTrue);
     });
 
+    test('the argument of a date or time format is a placeholder', () {
+      expect(extractPlaceholdersFromText('Saved {when, date, ::yMMMd} at {when, time, ::Hm}'), {'when'});
+    });
+
+    test('a renamed typed argument is visible', () {
+      final english = extractPlaceholdersFromText('Total: {amount, number}');
+      final german = extractPlaceholdersFromText('Summe: {summe, number}');
+      expect(placeholdersMatch(english: english, target: german), isFalse);
+    });
+
+    test("quotes are text: gen-l10n's default syntax (use-escaping: false) is the one checked", () {
+      expect(extractPlaceholdersFromText("Tap '{name}' to continue"), {'name'});
+      expect(hasBalancedBraces("Tap '{' to continue"), isFalse);
+    });
+
     test('unbalanced braces do not throw', () {
       expect(extractPlaceholdersFromText('{count, plural, other{{count} files'), {'count'});
       expect(extractPlaceholdersFromText('broken } text {'), isEmpty);

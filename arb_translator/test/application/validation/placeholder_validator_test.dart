@@ -13,45 +13,27 @@ void main() {
 
     test('detects mismatch', () {
       final e = entry(en: 'Hello {name}', fr: 'Bonjour {nom}');
-      final errors = validator.validateCell(
-        entry: e,
-        locale: 'fr',
-        baseLocale: base,
-        allEntries: [e],
-        previousErrors: {},
-      );
+      final errors = validator.validateCell(entry: e, locale: 'fr', baseLocale: base, previousErrors: {});
+      expect(errors.contains(('greet', 'fr')), isTrue);
+    });
+
+    test('an unclosed plural is an error even with the right placeholders', () {
+      final e = entry(en: '{count, plural, one{One} other{Many}}', fr: '{count, plural, one{Un} other{Plusieurs}');
+      final errors = validator.validateCell(entry: e, locale: 'fr', baseLocale: base, previousErrors: {});
       expect(errors.contains(('greet', 'fr')), isTrue);
     });
 
     test('clears error after fix', () {
       final e1 = entry(en: 'Hello {name}', fr: 'Bonjour {nom}');
-      final withError = validator.validateCell(
-        entry: e1,
-        locale: 'fr',
-        baseLocale: base,
-        allEntries: [e1],
-        previousErrors: {},
-      );
+      final withError = validator.validateCell(entry: e1, locale: 'fr', baseLocale: base, previousErrors: {});
       final e2 = entry(en: 'Hello {name}', fr: 'Bonjour {name}');
-      final cleared = validator.validateCell(
-        entry: e2,
-        locale: 'fr',
-        baseLocale: base,
-        allEntries: [e2],
-        previousErrors: withError,
-      );
+      final cleared = validator.validateCell(entry: e2, locale: 'fr', baseLocale: base, previousErrors: withError);
       expect(cleared.contains(('greet', 'fr')), isFalse);
     });
 
     test('revalidates all locales when base locale changed', () {
       final e1 = const TranslationEntry(key: 'phrase', values: {base: 'Hi {name}', 'fr': 'Salut {name}'});
-      final errs1 = validator.validateCell(
-        entry: e1,
-        locale: 'fr',
-        baseLocale: base,
-        allEntries: [e1],
-        previousErrors: {},
-      );
+      final errs1 = validator.validateCell(entry: e1, locale: 'fr', baseLocale: base, previousErrors: {});
       expect(errs1, isEmpty);
       // Change base locale placeholders -> now mismatch
       final e2 = const TranslationEntry(key: 'phrase', values: {base: 'Hi {firstName}', 'fr': 'Salut {name}'});
@@ -59,7 +41,6 @@ void main() {
         entry: e2,
         locale: base, // indicate base changed
         baseLocale: base,
-        allEntries: [e2],
         previousErrors: errs1,
       );
       expect(errs2.contains(('phrase', 'fr')), isTrue);
