@@ -15,6 +15,7 @@ abstract class ProjectState with _$ProjectState {
     @Default(<(String, String)>{}) Set<(String key, String locale)> dirtyCells,
     @Default(<String>{}) Set<String> dirtyLocales,
     @Default(<(String, String)>{}) Set<(String, String)> errorCells,
+
     /// Non-empty translations whose base-locale source changed after they were made.
     @Default(<(String, String)>{}) Set<(String key, String locale)> staleCells,
     @Default(false) bool hasUnsavedChanges,

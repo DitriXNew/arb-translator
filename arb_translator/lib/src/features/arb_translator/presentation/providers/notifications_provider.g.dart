@@ -14,8 +14,7 @@ part of 'notifications_provider.dart';
 const notificationMessageProvider = NotificationMessageProvider._();
 
 /// Ephemeral notification provider.
-final class NotificationMessageProvider
-    extends $NotifierProvider<NotificationMessage, String?> {
+final class NotificationMessageProvider extends $NotifierProvider<NotificationMessage, String?> {
   /// Ephemeral notification provider.
   const NotificationMessageProvider._()
     : super(
@@ -37,15 +36,11 @@ final class NotificationMessageProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(String? value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<String?>(value),
-    );
+    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<String?>(value));
   }
 }
 
-String _$notificationMessageHash() =>
-    r'8ed959a5b957f1cd92fcc15ca4cee5407efa025d';
+String _$notificationMessageHash() => r'8ed959a5b957f1cd92fcc15ca4cee5407efa025d';
 
 /// Ephemeral notification provider.
 
@@ -56,14 +51,7 @@ abstract class _$NotificationMessage extends $Notifier<String?> {
   void runBuild() {
     final created = build();
     final ref = this.ref as $Ref<String?, String?>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<String?, String?>,
-              String?,
-              Object?,
-              Object?
-            >;
+    final element = ref.element as $ClassProviderElement<AnyNotifier<String?, String?>, String?, Object?, Object?>;
     element.handleValue(ref, created);
   }
 }

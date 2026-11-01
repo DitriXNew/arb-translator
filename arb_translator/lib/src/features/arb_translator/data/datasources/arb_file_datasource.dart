@@ -167,8 +167,7 @@ class ArbFileDataSource {
         // Non-base locale: write the hash of the EN string this translation was made from,
         // so a stale translation stays stale across saves (and is detectable without the EN file).
         final sourceText = e.values[baseLocale] ?? '';
-        final hash =
-            e.sourceHashes[locale] ?? (sourceText.isNotEmpty ? HashUtils.computeSourceHash(sourceText) : null);
+        final hash = e.sourceHashes[locale] ?? (sourceText.isNotEmpty ? HashUtils.computeSourceHash(sourceText) : null);
         if (hash != null) {
           map['@${e.key}'] = {'sourceHash': hash};
         }

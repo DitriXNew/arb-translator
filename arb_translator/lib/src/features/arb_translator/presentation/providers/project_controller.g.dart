@@ -12,8 +12,7 @@ part of 'project_controller.dart';
 @ProviderFor(ProjectController)
 const projectControllerProvider = ProjectControllerProvider._();
 
-final class ProjectControllerProvider
-    extends $NotifierProvider<ProjectController, ProjectState> {
+final class ProjectControllerProvider extends $NotifierProvider<ProjectController, ProjectState> {
   const ProjectControllerProvider._()
     : super(
         from: null,
@@ -34,10 +33,7 @@ final class ProjectControllerProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ProjectState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<ProjectState>(value),
-    );
+    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<ProjectState>(value));
   }
 }
 
@@ -51,13 +47,7 @@ abstract class _$ProjectController extends $Notifier<ProjectState> {
     final created = build();
     final ref = this.ref as $Ref<ProjectState, ProjectState>;
     final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<ProjectState, ProjectState>,
-              ProjectState,
-              Object?,
-              Object?
-            >;
+        ref.element as $ClassProviderElement<AnyNotifier<ProjectState, ProjectState>, ProjectState, Object?, Object?>;
     element.handleValue(ref, created);
   }
 }
