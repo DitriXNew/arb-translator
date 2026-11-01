@@ -1,6 +1,7 @@
 import 'package:arb_translator/src/core/theme/color_tokens.dart';
 import 'package:arb_translator/src/core/theme/spacing.dart';
 import 'package:arb_translator/src/core/theme/text_styles.dart';
+import 'package:arb_translator/src/features/arb_translator/domain/entities/ai_settings.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_settings_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_strategy_registry.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/notifications_provider.dart';
@@ -158,7 +159,7 @@ class ProjectToolbar extends ConsumerWidget {
               ),
             ),
           IconButton(
-            tooltip: 'AI Settings (API key & glossary prompt)',
+            tooltip: 'AI Settings (API key, model & glossary prompt)',
             icon: const Icon(Icons.settings, size: 20),
             onPressed: () => _showAiSettingsDialog(context, ref),
           ),
@@ -188,6 +189,7 @@ class ProjectToolbar extends ConsumerWidget {
     final selectedStrategy = ref.read(selectedAiStrategyIdProvider);
     final keyController = TextEditingController();
     final glossaryController = TextEditingController(text: settings.glossaryPrompt);
+    final modelController = TextEditingController(text: settings.openAiModel);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -265,16 +267,14 @@ class ProjectToolbar extends ConsumerWidget {
                   decoration: const InputDecoration(hintText: 'List important product names...'),
                 ),
                 const SizedBox(height: 16),
-                if (selectedStrategy == 'openai')
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Legacy info line kept for clarity.
-                      Text('Using model ${settings.openAiModel} (fixed)', style: AppTextStyles.caption11),
-                    ],
-                  )
-                else
-                  const Text('Model settings disabled', style: AppTextStyles.caption11),
+                const Text('Model', style: AppTextStyles.body13),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: modelController,
+                  decoration: const InputDecoration(hintText: kDefaultAiModel, helperText: 'Empty: $kDefaultAiModel'),
+                ),
+                if (selectedStrategy != 'openai')
+                  const Text('Used only by the OpenAI strategy', style: AppTextStyles.caption11),
               ],
             ),
           ),
@@ -284,8 +284,11 @@ class ProjectToolbar extends ConsumerWidget {
           ElevatedButton(
             onPressed: () async {
               final text = glossaryController.text;
+              final model = modelController.text;
               Navigator.pop(ctx);
-              await ref.read(aiSettingsProvider.notifier).setGlossaryPrompt(text);
+              final notifier = ref.read(aiSettingsProvider.notifier);
+              await notifier.setGlossaryPrompt(text);
+              await notifier.setModel(model);
             },
             child: const Text('Save'),
           ),
@@ -326,5 +329,3 @@ class _StrategySelector extends ConsumerWidget {
     );
   }
 }
-
-// Removed _ModelField and _TemperatureSlider (model & temperature fixed). Kept comment stub for future reinstatement if needed.

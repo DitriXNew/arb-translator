@@ -6,7 +6,10 @@ import 'package:arb_translator/src/cli/cli_options.dart';
 import 'package:arb_translator/src/core/utils/hash_utils.dart';
 import 'package:arb_translator/src/features/arb_translator/data/ai/mock_strategy.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/ai/ai_translation_strategy.dart';
+import 'package:arb_translator/src/features/arb_translator/domain/entities/ai_settings.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:path/path.dart' as p;
 
 /// Answers every key with fixed text, ignoring the source.
@@ -347,6 +350,65 @@ void main() {
     test('rejects a non-positive batch size and an endpoint that is not a URL', () {
       expect(() => CliOptions.parse(['-d', 'x', '--batch-size', '0']), throwsA(isA<CliUsageException>()));
       expect(() => CliOptions.parse(['-d', 'x', '--endpoint', 'nope']), throwsA(isA<CliUsageException>()));
+    });
+
+    test('the model defaults to the one the app uses', () {
+      expect(CliOptions.parse(['-d', 'x'])!.model, kDefaultAiModel);
+      expect(CliOptions.parse(['-d', 'x', '--model', 'other'])!.model, 'other');
+    });
+
+    test('openai requests carry the chosen model and the API key', () async {
+      final requests = <http.Request>[];
+      final client = MockClient((request) async {
+        requests.add(request);
+        final items =
+            json.decode(
+                  RegExp(r'\[.*\]', dotAll: true).firstMatch(
+                    (((json.decode(request.body) as Map)['messages'] as List).last as Map)['content'] as String,
+                  )![0]!,
+                )
+                as List;
+        final translations = [
+          for (final item in items.cast<Map>()) {'key': item['key'], 'translation': '${item['text']}<de>'},
+        ];
+        return http.Response(
+          json.encode({
+            'choices': [
+              {
+                'message': {
+                  'content': json.encode({'translations': translations}),
+                },
+              },
+            ],
+          }),
+          200,
+        );
+      });
+      Future<void> runOpenAi(List<String> args, {Map<String, String> environment = const {}}) async {
+        final options = CliOptions.parse(['-d', dir.path, '--locales', 'de', ...args], environment: environment)!;
+        final code = await ArbTranslateCommand(
+          out: out,
+          err: err,
+          strategyFactory: (o) => defaultStrategyFactory(o, client: client),
+        ).run(options);
+        expect(code, CliExitCode.ok, reason: '$err');
+      }
+
+      await runOpenAi(['--model', 'custom-model', '--api-key', 'sk-flag']);
+      expect(requests, isNotEmpty);
+      for (final request in requests) {
+        expect((json.decode(request.body) as Map)['model'], 'custom-model');
+        expect(request.headers['Authorization'], 'Bearer sk-flag');
+      }
+      expect(read('de')['zeta'], 'Last word<de>');
+
+      requests.clear();
+      await runOpenAi(['--mode', 'all'], environment: {'OPENAI_API_KEY': 'sk-env'});
+      expect(requests, isNotEmpty);
+      for (final request in requests) {
+        expect((json.decode(request.body) as Map)['model'], kDefaultAiModel);
+        expect(request.headers['Authorization'], 'Bearer sk-env');
+      }
     });
 
     test('openai without a key is refused before any request', () async {

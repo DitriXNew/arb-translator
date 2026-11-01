@@ -5,9 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-// Persistence keys (model is fixed constant; only key & glossary stored).
+// Persistence keys.
 const _kApiKey = 'ai_api_key';
 const _kGlossary = 'ai_glossary_prompt';
+const _kModel = 'ai_model';
 
 final aiSettingsProvider = NotifierProvider<AiSettingsNotifier, AiSettings>(AiSettingsNotifier.new);
 
@@ -18,14 +19,18 @@ class AiSettingsNotifier extends Notifier<AiSettings> {
   AiSettings build() {
     _storage = const FlutterSecureStorage();
     _load();
-    // openAiModel is fixed via kDefaultAiModel constant
     return const AiSettings();
   }
 
   Future<void> _load() async {
     final key = await _storage.read(key: _kApiKey);
     final glossary = await _storage.read(key: _kGlossary) ?? '';
-    state = state.copyWith(apiKeyMasked: _mask(key), glossaryPrompt: glossary);
+    final model = await _storage.read(key: _kModel);
+    state = state.copyWith(
+      apiKeyMasked: _mask(key),
+      glossaryPrompt: glossary,
+      openAiModel: (model == null || model.isEmpty) ? null : model,
+    );
   }
 
   String _mask(String? key) {
@@ -49,7 +54,17 @@ class AiSettingsNotifier extends Notifier<AiSettings> {
     state = state.copyWith(glossaryPrompt: prompt);
   }
 
-  // Removed setModel – model is fixed.
+  /// Stores the model name; a blank [model] restores [kDefaultAiModel].
+  Future<void> setModel(String model) async {
+    final trimmed = model.trim();
+    if (trimmed.isEmpty) {
+      await _storage.delete(key: _kModel);
+      state = state.copyWith(openAiModel: kDefaultAiModel);
+    } else {
+      await _storage.write(key: _kModel, value: trimmed);
+      state = state.copyWith(openAiModel: trimmed);
+    }
+  }
 
   Future<String?> readFullKey() => _storage.read(key: _kApiKey);
 

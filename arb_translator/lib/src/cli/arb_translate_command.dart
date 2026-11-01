@@ -33,10 +33,12 @@ class CliExitCode {
 typedef StrategyFactory = AiTranslationStrategy Function(CliOptions options);
 
 /// The default factory: OpenAI (or a compatible endpoint) or the offline mock.
-AiTranslationStrategy defaultStrategyFactory(CliOptions options) => switch (options.provider) {
+///
+/// Requests go through [client]; tests pass a fake one to see what is sent.
+AiTranslationStrategy defaultStrategyFactory(CliOptions options, {http.Client? client}) => switch (options.provider) {
   AiStrategyIds.mock => const MockTranslationStrategy(),
   _ => OpenAiTranslationStrategy(
-    OpenAiRemoteDataSource(http.Client()),
+    OpenAiRemoteDataSource(client ?? http.Client()),
     model: options.model,
     endpoint: options.endpoint,
   ),

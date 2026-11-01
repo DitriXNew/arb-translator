@@ -78,7 +78,11 @@ class CliOptions {
     ..addOption('keys', abbr: 'k', help: 'Comma-separated keys to limit the run to.')
     ..addFlag('remove-orphans', negatable: false, help: 'Delete keys that locale files have but the template does not.')
     ..addOption('provider', allowed: _providers, defaultsTo: AiStrategyIds.openAi)
-    ..addOption('model', defaultsTo: kDefaultAiModel, help: 'Model name sent to the provider.')
+    ..addOption(
+      'model',
+      defaultsTo: kDefaultAiModel,
+      help: 'Model name sent to the provider. The model set in the app is not read; pass it here.',
+    )
     ..addOption('endpoint', help: 'Chat-completions URL of an OpenAI-compatible server. Default: OpenAI.')
     ..addOption('api-key', help: 'API key. Default: the OPENAI_API_KEY environment variable.')
     ..addOption('glossary-file', help: 'Text file with glossary / style instructions added to every prompt.')
