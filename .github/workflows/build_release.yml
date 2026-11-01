@@ -1,6 +1,10 @@
-name: Manual Build & Release
+name: Build & Release
 
+# Pushing a tag v<pubspec version> (e.g. v1.3.0+14) builds and publishes a release.
+# A manual run builds from the pubspec version and creates the tag if asked to.
 on:
+  push:
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       create_release:
@@ -26,6 +30,10 @@ jobs:
         id: version
         run: |
           VER=$(grep '^version:' ${{ env.PROJECT_PATH }}/pubspec.yaml | cut -d ' ' -f2)
+          if [ "${{ github.ref_type }}" = "tag" ] && [ "${{ github.ref_name }}" != "v$VER" ]; then
+            echo "::error::Tag ${{ github.ref_name }} does not match pubspec version $VER (expected v$VER)"
+            exit 1
+          fi
           echo "version=$VER" >> $GITHUB_OUTPUT
 
   build:
@@ -90,7 +98,7 @@ jobs:
 
   release:
     needs: [build, version]
-    if: ${{ github.event.inputs.create_release == 'true' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.create_release == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -99,6 +107,7 @@ jobs:
         with:
           path: artifacts
       - name: Create tag
+        if: github.event_name == 'workflow_dispatch'
         run: |
           git fetch --tags
           if git rev-parse "v${{ needs.version.outputs.version }}" >/dev/null 2>&1; then
@@ -110,7 +119,7 @@ jobs:
         with:
           tag_name: v${{ needs.version.outputs.version }}
           name: arb_translator v${{ needs.version.outputs.version }}
-          body: Manual release
+          generate_release_notes: true
           files: |
             artifacts/arb_translator-linux/arb_translator-linux.tar.gz
             artifacts/arb_translator-windows/arb_translator-windows.zip
