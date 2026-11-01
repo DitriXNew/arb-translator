@@ -42,6 +42,39 @@ Focused benefits:
 * Retry (up to 3 attempts) on transient errors
 * Bulk mode skips already filled cells when you pick “Only Empty”
 
+## Command Line
+The same translation runs headless, e.g. in CI. From the `arb_translator` folder:
+
+```sh
+export OPENAI_API_KEY=sk-...
+dart run arb_translator:arb_translator_cli --dir ../lib/l10n --locales de,fr
+```
+
+By default it translates every non-template locale in the folder, filling empty cells and cells whose English text changed since they were translated (the same rule as **"Only Empty"** in the app).
+
+| Option | Meaning |
+| --- | --- |
+| `-d, --dir` | Folder with the ARB files (template and locales). Required. |
+| `-l, --locales` | Comma-separated target locales. A locale without a file gets one. Default: every locale found. |
+| `--mode` | `missing` (default): empty and stale translations. `all`: every key, overwriting existing translations. |
+| `-k, --keys` | Comma-separated keys to limit the run to. |
+| `--remove-orphans` | Delete keys that locale files have but the template does not. |
+| `--provider` | `openai` (default) or `mock` (offline, for trying the tool out). |
+| `--model` | Model name sent to the provider. Default: `gpt-6.1-sol`, the app's default. The model set in the app is not read; pass it here. |
+| `--endpoint` | Chat-completions URL of an OpenAI-compatible server. Default: OpenAI. |
+| `--api-key` | API key. Default: the `OPENAI_API_KEY` environment variable. |
+| `--glossary-file` | Text file with glossary / style instructions added to every prompt. |
+| `--batch-size` | Keys per request. Default: 100. |
+| `--dry-run` | Report what would change; call no provider, write no file. |
+
+What it guarantees:
+* The English template is never written.
+* Only locale files the run changed are written, and only the keys it changed; key order and the rest of the file stay as they were.
+* A translation that loses or renames a placeholder, or breaks a plural/select, is rejected and the cell is left unchanged.
+* Locale files must be named `<prefix><locale>.arb` with a matching `@@locale`; otherwise the run stops before writing anything.
+
+Exit codes: `0` — done; `1` — finished, but some cells failed (listed on stderr); `64` — bad command line or folder.
+
 ## Placeholder Safety
 Every edit or AI result re‑checks placeholder sets vs English. Any difference = highlighted error + filterable.
 
