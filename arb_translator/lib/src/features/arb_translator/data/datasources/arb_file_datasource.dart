@@ -160,7 +160,7 @@ class ArbFileDataSource {
                 for (final placeholder in e.meta.placeholders.entries)
                   placeholder.key: Map<String, dynamic>.from(placeholder.value),
               },
-            if (currentHash != null) 'sourceHash': currentHash,
+            'sourceHash': ?currentHash,
           };
         }
       } else {
