@@ -52,12 +52,38 @@ dart run arb_translator:arb_translator_cli --dir ../lib/l10n --locales de,fr
 
 By default it translates every non-template locale in the folder, filling empty cells and cells whose English text changed since they were translated (the same rule as **"Only Empty"** in the app).
 
+### Targeted translation
+Name the locales and keys to touch; both take a comma-separated list or a repeated flag:
+
+```sh
+# Retranslate two keys in two locales, overwriting what is there
+dart run arb_translator:arb_translator_cli -d ../lib/l10n -l de,fr -k loginTitle,loginButton
+# The same, as repeated flags
+dart run arb_translator:arb_translator_cli -d ../lib/l10n -l de -l fr -k loginTitle -k loginButton
+```
+
+With `--keys` the mode defaults to `all`: the named keys are retranslated even when they already have a translation. Add `--mode missing` to fill only the empty and stale ones among them. Every other key and locale is left untouched.
+
+### Export all translations to one file
+`--export` translates nothing; it writes one table — a row per key, columns `key`, `description`, the template locale, then each locale:
+
+```sh
+dart run arb_translator:arb_translator_cli -d ../lib/l10n --export translations.md
+dart run arb_translator:arb_translator_cli -d ../lib/l10n --export translations.csv -l de,fr -k loginTitle
+dart run arb_translator:arb_translator_cli -d ../lib/l10n --export - --export-format csv > translations.csv
+```
+
+* The format comes from the extension (`.md`, `.csv`) or `--export-format`; `-` writes to stdout.
+* `--locales` and `--keys` narrow the columns and rows; the template column is always included. Keys only locale files have (orphans) are left out.
+* CSV is RFC 4180 (quoted fields, CRLF) with a UTF-8 BOM so Excel reads non-Latin text correctly. In Markdown, `|` is escaped and line breaks become `<br>`.
+* No API key is needed.
+
 | Option | Meaning |
 | --- | --- |
 | `-d, --dir` | Folder with the ARB files (template and locales). Required. |
-| `-l, --locales` | Comma-separated target locales. A locale without a file gets one. Default: every locale found. |
-| `--mode` | `missing` (default): empty and stale translations. `all`: every key, overwriting existing translations. |
-| `-k, --keys` | Comma-separated keys to limit the run to. |
+| `-l, --locales` | Target locales, comma-separated or repeated. A locale without a file gets one. Default: every locale found. |
+| `--mode` | `missing`: empty and stale translations. `all`: every key, overwriting existing translations. Default: `all` with `--keys`, otherwise `missing`. |
+| `-k, --keys` | Keys to limit the run to, comma-separated or repeated. |
 | `--remove-orphans` | Delete keys that locale files have but the template does not. |
 | `--provider` | `openai` (default) or `mock` (offline, for trying the tool out). |
 | `--model` | Model name sent to the provider. Default: `gpt-6.1-sol`, the app's default. The model set in the app is not read; pass it here. |
@@ -66,6 +92,8 @@ By default it translates every non-template locale in the folder, filling empty 
 | `--glossary-file` | Text file with glossary / style instructions added to every prompt. |
 | `--batch-size` | Keys per request. Default: 100. |
 | `--dry-run` | Report what would change; call no provider, write no file. |
+| `-e, --export` | Translate nothing; write every translation into one table at this path (`-` for stdout). Not combinable with `--dry-run` / `--remove-orphans`. |
+| `--export-format` | `md` or `csv`. Default: from the `--export` file extension. |
 
 What it guarantees:
 * The English template is never written.

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:arb_translator/src/cli/cli_options.dart';
+import 'package:arb_translator/src/cli/translation_table_export.dart';
 import 'package:arb_translator/src/core/utils/arb_utils.dart';
 import 'package:arb_translator/src/features/arb_translator/application/services/batch_translation_runner.dart';
 import 'package:arb_translator/src/features/arb_translator/data/ai/mock_strategy.dart';
@@ -90,6 +91,16 @@ class ArbTranslateCommand {
     }
     final unknownKeys = options.keys?.difference(baseKeys) ?? const <String>{};
     if (unknownKeys.isNotEmpty) throw CliUsageException('Not in the template: ${unknownKeys.join(', ')}');
+    if (options.isExport) {
+      return _export(
+        options,
+        baseLocale: baseLocale,
+        locales: locales,
+        targets: targets,
+        entries: loaded,
+        baseKeys: baseKeys,
+      );
+    }
     if (options.provider == AiStrategyIds.openAi && !options.dryRun && options.apiKey == null) {
       throw const CliUsageException('No API key: pass --api-key or set OPENAI_API_KEY.');
     }
@@ -130,6 +141,44 @@ class ArbTranslateCommand {
       err.writeln('$failures translation(s) failed; those cells were left unchanged.');
       return CliExitCode.partialFailure;
     }
+    return CliExitCode.ok;
+  }
+
+  /// Writes the template keys (narrowed by `--keys`) of [targets] into one table; translates nothing.
+  Future<int> _export(
+    CliOptions options, {
+    required String baseLocale,
+    required List<String> locales,
+    required List<String> targets,
+    required List<TranslationEntry> entries,
+    required Set<String> baseKeys,
+  }) async {
+    final missing = targets.where((t) => !locales.contains(t)).toList();
+    if (missing.isNotEmpty) throw CliUsageException('No ARB file for: ${missing.join(', ')}');
+    final rows = [
+      for (final e in entries)
+        if (baseKeys.contains(e.key) && (options.keys?.contains(e.key) ?? true)) e,
+    ];
+    final table = TranslationTableExport.render(
+      format: options.exportFormat!,
+      baseLocale: baseLocale,
+      locales: targets,
+      entries: rows,
+    );
+    final path = options.exportPath!;
+    if (path == '-') {
+      out.write(table);
+      return CliExitCode.ok;
+    }
+    final file = File(path);
+    try {
+      file.parent.createSync(recursive: true);
+      // A BOM makes Excel read a CSV as UTF-8 instead of the ANSI code page.
+      await file.writeAsString(options.exportFormat == ExportFormat.csv ? '﻿$table' : table);
+    } on FileSystemException catch (e) {
+      throw CliUsageException('Cannot write $path: ${e.message}');
+    }
+    out.writeln('Exported ${rows.length} key(s) x ${targets.length + 1} locale(s) to $path');
     return CliExitCode.ok;
   }
 

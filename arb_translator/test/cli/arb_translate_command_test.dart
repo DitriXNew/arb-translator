@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:arb_translator/src/cli/arb_translate_command.dart';
 import 'package:arb_translator/src/cli/cli_options.dart';
+import 'package:arb_translator/src/cli/translation_table_export.dart';
 import 'package:arb_translator/src/core/utils/hash_utils.dart';
 import 'package:arb_translator/src/features/arb_translator/data/ai/mock_strategy.dart';
 import 'package:arb_translator/src/features/arb_translator/domain/ai/ai_translation_strategy.dart';
@@ -334,9 +335,134 @@ void main() {
     expect(err.toString(), contains('Not in the template: nope'));
   });
 
+  test('--keys without --mode retranslates those keys even when they are translated', () async {
+    expect(await runCli(['-l', 'de', '-k', 'alpha']), CliExitCode.ok, reason: '$err');
+
+    final de = read('de');
+    expect(de['alpha'], 'First word<de>');
+    expect(de.containsKey('zeta'), isFalse, reason: 'keys not named stay untouched');
+  });
+
+  test('--keys with --mode missing keeps up-to-date translations', () async {
+    expect(await runCli(['-l', 'de', '-k', 'alpha', '--mode', 'missing']), CliExitCode.ok, reason: '$err');
+    expect(read('de')['alpha'], 'Erstes Wort');
+  });
+
+  test('locales and keys can be repeated as well as comma-separated', () async {
+    expect(await runCli(['-l', 'de', '-l', 'fr', '-k', 'zeta,greeting', '-k', 'alpha']), CliExitCode.ok);
+
+    expect(read('de')['zeta'], 'Last word<de>');
+    expect(read('fr')['alpha'], 'First word<fr>');
+    expect(read('fr')['greeting'], 'Hello {name}<fr>');
+  });
+
+  group('export', () {
+    test('writes every template key and locale into one Markdown table and translates nothing', () async {
+      final frBefore = arb('fr').readAsStringSync();
+      final target = p.join(dir.path, 'out', 'all.md');
+
+      expect(await runCli(['--export', target]), CliExitCode.ok, reason: '$err');
+
+      expect(
+        File(target).readAsStringSync(),
+        '| key | description | en | de | fr |\n'
+        '| --- | --- | --- | --- | --- |\n'
+        '| alpha | a | First word | Erstes Wort | Premier mot |\n'
+        '| greeting | g | Hello {name} |  | Bonjour {name} |\n'
+        '| zeta | z | Last word |  | Dernier mot |\n',
+      );
+      expect(arb('fr').readAsStringSync(), frBefore);
+      expect(out.toString(), contains('Exported 3 key(s)'));
+    });
+
+    test('--locales and --keys narrow the table', () async {
+      final target = p.join(dir.path, 'some.md');
+
+      expect(await runCli(['-e', target, '-l', 'fr', '-k', 'zeta,alpha']), CliExitCode.ok, reason: '$err');
+
+      expect(
+        File(target).readAsStringSync(),
+        '| key | description | en | fr |\n'
+        '| --- | --- | --- | --- |\n'
+        '| alpha | a | First word | Premier mot |\n'
+        '| zeta | z | Last word | Dernier mot |\n',
+      );
+    });
+
+    test('CSV quotes what needs quoting and starts with a BOM', () async {
+      arb('fr').writeAsStringSync(json.encode({'@@locale': 'fr', 'alpha': 'Un, "deux"', 'zeta': 'ligne\nsuivante'}));
+      final target = p.join(dir.path, 'all.csv');
+
+      expect(await runCli(['--export', target, '-l', 'fr']), CliExitCode.ok, reason: '$err');
+
+      final bytes = File(target).readAsBytesSync();
+      expect(bytes.take(3), [0xEF, 0xBB, 0xBF], reason: 'a UTF-8 BOM, so Excel reads the file as UTF-8');
+      expect(
+        utf8.decode(bytes.skip(3).toList()),
+        r'key,description,en,fr'
+        '\r\n'
+        'alpha,a,First word,"Un, ""deux"""\r\n'
+        'greeting,g,Hello {name},\r\n'
+        'zeta,z,Last word,"ligne\nsuivante"\r\n',
+      );
+    });
+
+    test('Markdown cells keep pipes and line breaks inside the cell', () async {
+      arb('de').writeAsStringSync(json.encode({'@@locale': 'de', 'alpha': 'a | b\nc'}));
+
+      expect(await runCli(['--export', '-', '--export-format', 'md', '-l', 'de', '-k', 'alpha']), CliExitCode.ok);
+
+      expect(out.toString(), contains(r'| alpha | a | First word | a \| b<br>c |'));
+    });
+
+    test('- writes the table to stdout and nothing else', () async {
+      expect(await runCli(['--export', '-', '--export-format', 'csv', '-k', 'alpha']), CliExitCode.ok);
+      expect(out.toString(), 'key,description,en,de,fr\r\nalpha,a,First word,Erstes Wort,Premier mot\r\n');
+    });
+
+    test('needs no API key', () async {
+      final options = CliOptions.parse(['--dir', dir.path, '--export', '-', '--export-format', 'md'])!;
+      expect(options.provider, 'openai');
+
+      expect(
+        await ArbTranslateCommand(out: out, err: err).run(options),
+        CliExitCode.ok,
+        reason: '$err',
+      );
+    });
+
+    test('a locale without a file is a usage error', () async {
+      expect(await runCli(['--export', p.join(dir.path, 'x.md'), '-l', 'ja']), CliExitCode.usage);
+      expect(err.toString(), contains('No ARB file for: ja'));
+    });
+  });
+
   group('CliOptions', () {
     test('requires --dir', () {
       expect(() => CliOptions.parse([]), throwsA(isA<CliUsageException>()));
+    });
+
+    test('--export takes its format from the extension or --export-format', () {
+      expect(CliOptions.parse(['-d', 'x', '-e', 'a.CSV'])!.exportFormat, ExportFormat.csv);
+      expect(CliOptions.parse(['-d', 'x', '-e', 'a.txt', '--export-format', 'md'])!.exportFormat, ExportFormat.md);
+      expect(() => CliOptions.parse(['-d', 'x', '-e', 'a.txt']), throwsA(isA<CliUsageException>()));
+      expect(() => CliOptions.parse(['-d', 'x', '--export-format', 'md']), throwsA(isA<CliUsageException>()));
+    });
+
+    test('--export does not combine with flags that change files', () {
+      for (final flag in ['--dry-run', '--remove-orphans']) {
+        expect(() => CliOptions.parse(['-d', 'x', '-e', 'a.md', flag]), throwsA(isA<CliUsageException>()));
+      }
+    });
+
+    test('the mode defaults to all only when keys are named', () {
+      expect(CliOptions.parse(['-d', 'x'])!.mode, TranslateMode.missing);
+      expect(CliOptions.parse(['-d', 'x', '-k', 'a'])!.mode, TranslateMode.all);
+      expect(CliOptions.parse(['-d', 'x', '-k', 'a', '--mode', 'missing'])!.mode, TranslateMode.missing);
+    });
+
+    test('an empty list is a usage error', () {
+      expect(() => CliOptions.parse(['-d', 'x', '-l', ',']), throwsA(isA<CliUsageException>()));
     });
 
     test('reads the API key from OPENAI_API_KEY unless --api-key is given', () {
