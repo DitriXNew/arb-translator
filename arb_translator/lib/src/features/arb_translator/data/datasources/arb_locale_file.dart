@@ -8,9 +8,7 @@ import 'dart:io';
 /// and leaves the rest of the file as it was: empty values, other `@@` fields, other
 /// `@key` attributes, key order, line endings and the trailing newline.
 class ArbLocaleFile {
-  ArbLocaleFile._(this.file, this._data, {required bool trailingNewline, required bool crlf})
-    : _trailingNewline = trailingNewline,
-      _crlf = crlf;
+  ArbLocaleFile._(this.file, this._data, {required this._trailingNewline, required this._crlf});
 
   /// Reads [file], or starts an empty one for [locale] when it does not exist yet.
   factory ArbLocaleFile.open(File file, {required String locale}) {

@@ -7,9 +7,9 @@ import 'package:arb_translator/src/features/arb_translator/presentation/widgets/
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/search_bar.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/toolbar.dart';
 import 'package:file_selector/file_selector.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ProjectPage extends ConsumerStatefulWidget {
   const ProjectPage({super.key});

@@ -14,8 +14,8 @@ permissions:
   contents: read
 
 env:
-  # Pinned: a floating "stable" broke pub get when Flutter moved to Dart 3.14.
-  FLUTTER_VERSION: 3.47.9
+  # Pinned so a new stable cannot break the build unannounced; bump it on purpose.
+  FLUTTER_VERSION: 3.50.0
   PROJECT_PATH: arb_translator
   LOCALES_DIR: arb_translator/lib/l10n
 
@@ -72,7 +72,7 @@ jobs:
         run: flutter pub get
       - name: Generate code
         working-directory: ${{ env.PROJECT_PATH }}
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build
       - name: Run tests
         working-directory: ${{ env.PROJECT_PATH }}
         run: flutter test --no-pub

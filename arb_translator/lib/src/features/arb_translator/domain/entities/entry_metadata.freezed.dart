@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'entry_metadata.dart';
@@ -9,6 +9,7 @@ part of 'entry_metadata.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -28,16 +29,21 @@ $EntryMetadataCopyWith<EntryMetadata> get copyWith => _$EntryMetadataCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EntryMetadata&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.placeholders, placeholders)&&(identical(other.sourceHash, sourceHash) || other.sourceHash == sourceHash));
+  final _this = this as EntryMetadata;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EntryMetadata&&(identical(other.description, _this.description) || other.description == _this.description)&&const DeepCollectionEquality().equals(other.placeholders, _this.placeholders)&&(identical(other.sourceHash, _this.sourceHash) || other.sourceHash == _this.sourceHash));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,description,const DeepCollectionEquality().hash(placeholders),sourceHash);
+int get hashCode {
+  final _this = this as EntryMetadata;
+  return Object.hash(runtimeType,_this.description,const DeepCollectionEquality().hash(_this.placeholders),_this.sourceHash);
+}
 
 @override
 String toString() {
-  return 'EntryMetadata(description: $description, placeholders: $placeholders, sourceHash: $sourceHash)';
+  final _this = this as EntryMetadata;
+  return 'EntryMetadata(description: ${_this.description}, placeholders: ${_this.placeholders}, sourceHash: ${_this.sourceHash})';
 }
 
 
@@ -66,7 +72,7 @@ class _$EntryMetadataCopyWithImpl<$Res>
 /// Create a copy of EntryMetadata
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? description = freezed,Object? placeholders = null,Object? sourceHash = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(EntryMetadata(
 description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,placeholders: null == placeholders ? _self.placeholders : placeholders // ignore: cast_nullable_to_non_nullable
 as Map<String, Map<String, dynamic>>,sourceHash: freezed == sourceHash ? _self.sourceHash : sourceHash // ignore: cast_nullable_to_non_nullable
@@ -211,7 +217,7 @@ return $default(_that.description,_that.placeholders,_that.sourceHash);case _:
 @JsonSerializable()
 
 class _EntryMetadata implements EntryMetadata {
-  const _EntryMetadata({this.description, final  Map<String, Map<String, dynamic>> placeholders = const <String, Map<String, dynamic>>{}, this.sourceHash}): _placeholders = placeholders;
+  const _EntryMetadata({this.description,  Map<String, Map<String, dynamic>> placeholders = const <String, Map<String, dynamic>>{}, this.sourceHash}): _placeholders = placeholders;
   factory _EntryMetadata.fromJson(Map<String, dynamic> json) => _$EntryMetadataFromJson(json);
 
 @override final  String? description;
@@ -237,16 +243,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EntryMetadata&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._placeholders, _placeholders)&&(identical(other.sourceHash, sourceHash) || other.sourceHash == sourceHash));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _EntryMetadata&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.placeholders, _placeholders)&&(identical(other.sourceHash, sourceHash) || other.sourceHash == sourceHash));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,description,const DeepCollectionEquality().hash(_placeholders),sourceHash);
+int get hashCode {
+    return Object.hash(runtimeType,description,const DeepCollectionEquality().hash(_placeholders),sourceHash);
+}
 
 @override
 String toString() {
-  return 'EntryMetadata(description: $description, placeholders: $placeholders, sourceHash: $sourceHash)';
+    return 'EntryMetadata(description: $description, placeholders: $placeholders, sourceHash: $sourceHash)';
 }
 
 

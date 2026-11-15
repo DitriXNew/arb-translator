@@ -5,8 +5,8 @@ import 'package:arb_translator/src/core/theme/text_styles.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/locale_translation_progress_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_state.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Builder for table header cells with sorting and translation actions
 class TableHeaderBuilder {

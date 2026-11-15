@@ -1,8 +1,8 @@
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_errors_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/translation_progress_provider.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 class BrandTranslationProgressPanel extends ConsumerWidget {
   const BrandTranslationProgressPanel({super.key});

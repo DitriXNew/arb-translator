@@ -4,8 +4,8 @@ import 'package:arb_translator/src/features/arb_translator/presentation/provider
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_state.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/translation_cell.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Builder for individual table cells with proper decoration and behavior
 class TableCellBuilder {

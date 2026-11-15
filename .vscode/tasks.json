@@ -93,7 +93,7 @@
             "label": "Dart: Code Generation",
             "type": "shell",
             "command": "dart",
-            "args": ["run", "build_runner", "build", "--delete-conflicting-outputs"],
+            "args": ["run", "build_runner", "build"],
             "options": {
                 "cwd": "${workspaceFolder}/arb_translator"
             },
@@ -110,7 +110,7 @@
             "label": "Dart: Watch Code Generation",
             "type": "shell",
             "command": "dart",
-            "args": ["run", "build_runner", "watch", "--delete-conflicting-outputs"],
+            "args": ["run", "build_runner", "watch"],
             "options": {
                 "cwd": "${workspaceFolder}/arb_translator"
             },

@@ -1,5 +1,5 @@
 import 'package:arb_translator/src/core/theme/color_tokens.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 ThemeData buildAppTheme() {
   final base = ThemeData.dark();

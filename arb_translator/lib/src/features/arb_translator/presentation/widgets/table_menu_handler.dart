@@ -1,7 +1,7 @@
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Handler for table context menus and translation actions
 class TableMenuHandler {

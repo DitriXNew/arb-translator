@@ -487,13 +487,11 @@ void main() {
       final requests = <http.Request>[];
       final client = MockClient((request) async {
         requests.add(request);
-        final items =
-            json.decode(
-                  RegExp(r'\[.*\]', dotAll: true).firstMatch(
-                    (((json.decode(request.body) as Map)['messages'] as List).last as Map)['content'] as String,
-                  )![0]!,
-                )
-                as List;
+        final items = json.decode(
+          RegExp(r'\[.*\]', dotAll: true).firstMatch(
+            (((json.decode(request.body) as Map)['messages'] as List).last as Map)['content'] as String,
+          )![0]!,
+        ) as List;
         final translations = [
           for (final item in items.cast<Map>()) {'key': item['key'], 'translation': '${item['text']}<de>'},
         ];

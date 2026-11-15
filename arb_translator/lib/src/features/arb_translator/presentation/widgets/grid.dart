@@ -11,10 +11,9 @@ import 'package:arb_translator/src/features/arb_translator/presentation/widgets/
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/table_header_builder.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/table_menu_handler.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/table_sort_handler.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Custom lightweight translation table replacing PlutoGrid.
 /// Features implemented:

@@ -1,7 +1,7 @@
 import 'package:arb_translator/src/core/services/log_service.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/log_provider.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Debug dialog to view application logs
 class LogViewerDialog extends ConsumerWidget {

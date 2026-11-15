@@ -12,14 +12,14 @@ part of 'active_cell_translation_provider.dart';
 /// Stores (key, locale) of the cell currently being translated.
 
 @ProviderFor(ActiveCellTranslation)
-const activeCellTranslationProvider = ActiveCellTranslationProvider._();
+final activeCellTranslationProvider = ActiveCellTranslationProvider._();
 
 /// Active per-cell translation indicator using a generated Notifier provider.
 /// Stores (key, locale) of the cell currently being translated.
 final class ActiveCellTranslationProvider extends $NotifierProvider<ActiveCellTranslation, (String, String)?> {
   /// Active per-cell translation indicator using a generated Notifier provider.
   /// Stores (key, locale) of the cell currently being translated.
-  const ActiveCellTranslationProvider._()
+  ActiveCellTranslationProvider._()
     : super(
         from: null,
         argument: null,
@@ -52,8 +52,7 @@ abstract class _$ActiveCellTranslation extends $Notifier<(String, String)?> {
   (String, String)? build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<(String, String)?, (String, String)?>;
     final element =
         ref.element
@@ -63,6 +62,6 @@ abstract class _$ActiveCellTranslation extends $Notifier<(String, String)?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

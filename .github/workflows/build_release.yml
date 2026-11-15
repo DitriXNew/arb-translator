@@ -16,8 +16,8 @@ permissions:
   contents: write
 
 env:
-  # Pinned: a floating "stable" broke pub get when Flutter moved to Dart 3.14.
-  FLUTTER_VERSION: 3.47.9
+  # Pinned so a new stable cannot break the build unannounced; bump it on purpose.
+  FLUTTER_VERSION: 3.50.0
   PROJECT_PATH: arb_translator
 
 jobs:

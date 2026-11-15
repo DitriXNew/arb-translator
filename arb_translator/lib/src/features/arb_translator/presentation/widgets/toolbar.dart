@@ -8,8 +8,8 @@ import 'package:arb_translator/src/features/arb_translator/presentation/provider
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/project_controller.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/log_viewer_dialog.dart';
 import 'package:file_selector/file_selector.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Main top toolbar with folder select and quick actions.
 

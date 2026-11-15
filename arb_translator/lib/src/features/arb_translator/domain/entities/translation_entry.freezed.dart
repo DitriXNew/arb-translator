@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'translation_entry.dart';
@@ -9,6 +9,7 @@ part of 'translation_entry.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -28,16 +29,21 @@ $TranslationEntryCopyWith<TranslationEntry> get copyWith => _$TranslationEntryCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TranslationEntry&&(identical(other.key, key) || other.key == key)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other.values, values)&&const DeepCollectionEquality().equals(other.sourceHashes, sourceHashes));
+  final _this = this as TranslationEntry;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TranslationEntry&&(identical(other.key, _this.key) || other.key == _this.key)&&(identical(other.meta, _this.meta) || other.meta == _this.meta)&&const DeepCollectionEquality().equals(other.values, _this.values)&&const DeepCollectionEquality().equals(other.sourceHashes, _this.sourceHashes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,key,meta,const DeepCollectionEquality().hash(values),const DeepCollectionEquality().hash(sourceHashes));
+int get hashCode {
+  final _this = this as TranslationEntry;
+  return Object.hash(runtimeType,_this.key,_this.meta,const DeepCollectionEquality().hash(_this.values),const DeepCollectionEquality().hash(_this.sourceHashes));
+}
 
 @override
 String toString() {
-  return 'TranslationEntry(key: $key, meta: $meta, values: $values, sourceHashes: $sourceHashes)';
+  final _this = this as TranslationEntry;
+  return 'TranslationEntry(key: ${_this.key}, meta: ${_this.meta}, values: ${_this.values}, sourceHashes: ${_this.sourceHashes})';
 }
 
 
@@ -66,7 +72,7 @@ class _$TranslationEntryCopyWithImpl<$Res>
 /// Create a copy of TranslationEntry
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? key = null,Object? meta = null,Object? values = null,Object? sourceHashes = null,}) {
-  return _then(_self.copyWith(
+  return _then(TranslationEntry(
 key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
 as String,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
 as EntryMetadata,values: null == values ? _self.values : values // ignore: cast_nullable_to_non_nullable
@@ -221,7 +227,7 @@ return $default(_that.key,_that.meta,_that.values,_that.sourceHashes);case _:
 @JsonSerializable()
 
 class _TranslationEntry implements TranslationEntry {
-  const _TranslationEntry({required this.key, this.meta = const EntryMetadata(), final  Map<String, String> values = const <String, String>{}, final  Map<String, String> sourceHashes = const <String, String>{}}): _values = values,_sourceHashes = sourceHashes;
+  const _TranslationEntry({required this.key, this.meta = const EntryMetadata(),  Map<String, String> values = const <String, String>{},  Map<String, String> sourceHashes = const <String, String>{}}): _values = values,_sourceHashes = sourceHashes;
   factory _TranslationEntry.fromJson(Map<String, dynamic> json) => _$TranslationEntryFromJson(json);
 
 @override final  String key;
@@ -254,16 +260,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TranslationEntry&&(identical(other.key, key) || other.key == key)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other._values, _values)&&const DeepCollectionEquality().equals(other._sourceHashes, _sourceHashes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TranslationEntry&&(identical(other.key, key) || other.key == key)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other.values, _values)&&const DeepCollectionEquality().equals(other.sourceHashes, _sourceHashes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,key,meta,const DeepCollectionEquality().hash(_values),const DeepCollectionEquality().hash(_sourceHashes));
+int get hashCode {
+    return Object.hash(runtimeType,key,meta,const DeepCollectionEquality().hash(_values),const DeepCollectionEquality().hash(_sourceHashes));
+}
 
 @override
 String toString() {
-  return 'TranslationEntry(key: $key, meta: $meta, values: $values, sourceHashes: $sourceHashes)';
+    return 'TranslationEntry(key: $key, meta: $meta, values: $values, sourceHashes: $sourceHashes)';
 }
 
 

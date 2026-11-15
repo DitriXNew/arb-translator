@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:arb_translator/src/core/theme/text_styles.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Lightweight table cell that shows TextField only when focused.
 /// When the cell is not focused - shows simple Text to save resources.

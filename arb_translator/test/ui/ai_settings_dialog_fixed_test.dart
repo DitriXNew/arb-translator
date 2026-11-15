@@ -2,7 +2,7 @@ import 'package:arb_translator/src/features/arb_translator/domain/entities/ai_se
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_strategy_registry.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/providers/ai_settings_provider.dart';
 import 'package:arb_translator/src/features/arb_translator/presentation/widgets/toolbar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
