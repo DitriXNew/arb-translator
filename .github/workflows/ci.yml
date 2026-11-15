@@ -14,7 +14,8 @@ permissions:
   contents: read
 
 env:
-  FLUTTER_VERSION: stable
+  # Pinned: a floating "stable" broke pub get when Flutter moved to Dart 3.14.
+  FLUTTER_VERSION: 3.47.9
   PROJECT_PATH: arb_translator
   LOCALES_DIR: arb_translator/lib/l10n
 
@@ -27,7 +28,8 @@ jobs:
       - name: Set up Flutter (cached)
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - name: Flutter pub get
         working-directory: ${{ env.PROJECT_PATH }}
@@ -53,7 +55,8 @@ jobs:
       - name: Set up Flutter (cached)
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - name: Enable desktop targets (Linux only)
         if: matrix.os == 'ubuntu-latest'
